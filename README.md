@@ -7,9 +7,9 @@
 - 앱스토어 검색탭 구현
 
 - 과제에 사용되는 API 정보는 아래 URL의 검색 API를 참고하세요.
-
-> [검색 API](https://affiliate.itunes.apple.com/resources/documentation/itunes-store-web-service-search-api/ "앱스토어")
-
+  - [검색 API](https://affiliate.itunes.apple.com/resources/documentation/itunes-store-web-service-search-api/ "앱스토어")
+  
+  
  --- 
     
 
@@ -18,15 +18,15 @@
 
 ### 필수 조건
 
-[ ] 검색창에는 한글 입력만 가능하도록 구현
+- [ ] 검색창에는 한글 입력만 가능하도록 구현
 
-[ ] 인기 검색어 대신 최근 검색어로 교체하여 구현(표시는 최대 10개)
+- [ ] 인기 검색어 대신 최근 검색어로 교체하여 구현(표시는 최대 10개)
 
-[ ] 검색시 연관검색어 대신 히스토리에서 검색하여 표시
+- [ ] 검색시 연관검색어 대신 히스토리에서 검색하여 표시
 
-[ ] 검색 결과 화면은 스크린샷과 동일하게 구현
+- [ ] 검색 결과 화면은 스크린샷과 동일하게 구현
 
-[ ] 상세 화면은 제공되는 API내에서 최대한 구현
+- [ ] 상세 화면은 제공되는 API내에서 최대한 구현
 
 
 ### 개발 환경
