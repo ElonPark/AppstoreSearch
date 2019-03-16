@@ -44,3 +44,16 @@
 - 오픈소스 사용 가능 (단, Alamofire와 같은 네트워크 관련 라이브러리 사용제한, 이미지 다운로드 포함)
 
 - cocoapod, carthage 등 사용시, 프로젝트에 프레임워크를 포함해서 commit해 주세요.
+
+  
+
+
+### 스크린샷
+---
+<div>
+    <img width="200" src="./screenshot/sc0.png">
+    <img width="200" src="./screenshot/sc1.png">
+    <img width="200" src="./screenshot/sc2.png">
+    <img width="200" src="./screenshot/sc3.png">
+</div>
+
