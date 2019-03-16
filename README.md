@@ -10,7 +10,7 @@
   - [검색 API](https://affiliate.itunes.apple.com/resources/documentation/itunes-store-web-service-search-api/ "앱스토어")
   
   
- --- 
+
     
 
 ## 개발 요건
@@ -48,8 +48,9 @@
   
 
 
-### 스크린샷
----
+## 스크린샷
+
+  
 <div>
     <img width="200" src="./screenshot/sc0.png">
     <img width="200" src="./screenshot/sc1.png">
