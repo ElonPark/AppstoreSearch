@@ -8,7 +8,7 @@ target 'appstoreSearch' do
   # Pods for appstoreSearch
   pod 'RxSwift',    '~> 4.0'
   pod 'RxCocoa',    '~> 4.0'
-
+  pod 'Cosmos', '~> 18.0'
 
   target 'appstoreSearchTests' do
     inherit! :search_paths

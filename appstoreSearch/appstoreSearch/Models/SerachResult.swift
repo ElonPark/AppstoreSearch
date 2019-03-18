@@ -34,7 +34,9 @@ struct Result: Codable {
     
 
 struct ResultElement: Codable {
-    let screenshotUrls: [String]
+    let screenshotURLs: [String]
+    let ipadScreenshotURLs: [String]
+    let appletvScreenshotURLs: [String]
     let artistViewURL: String
     let artworkURL60: String
     let artworkURL100: String
@@ -77,7 +79,9 @@ struct ResultElement: Codable {
     let sellerURL: String?
     
     enum CodingKeys: String, CodingKey {
-        case screenshotUrls
+        case screenshotURLs = "screenshotUrls"
+        case ipadScreenshotURLs = "ipadScreenshotUrls"
+        case appletvScreenshotURLs = "appletvScreenshotUrls"
         case artistViewURL = "artistViewUrl"
         case artworkURL60 = "artworkUrl60"
         case artworkURL100 = "artworkUrl100"

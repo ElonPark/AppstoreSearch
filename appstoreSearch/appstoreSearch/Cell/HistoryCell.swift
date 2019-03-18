@@ -18,6 +18,7 @@ class HistoryCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         titleLabel.text = ""
+        
     }
     
     override func prepareForReuse() {

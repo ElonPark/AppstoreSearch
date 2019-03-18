@@ -22,47 +22,35 @@ extension SearchViewController {
     }
     
     func setSearchController() {
-        searchController = UISearchController(searchResultsController: nil)
+        searchController = UISearchController(searchResultsController: relatedResultVC)
         searchController.searchBar.placeholder = "App Store"
+        searchController.searchBar.searchBarStyle = .minimal
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
         definesPresentationContext = true
     }
-    
-    func simpleAlert(message: String) -> UIAlertController {
-        let alert = UIAlertController(title: "",
-                                      message: message,
-                                      preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "확인", style: .cancel)
-        alert.addAction(okAction)
-        
-        return alert
+
+    func removeRelatedResultVC() {
+        guard view.subviews.contains(relatedResultVC.view) else {
+            return
+        }
+        relatedResultVC.remove()
     }
     
-    func errorAlert(_ error: Error) {
-        let alert = simpleAlert(message: error.localizedDescription)
-        
-        present(alert, animated: true)
-    }
-    
-    func search(by keyword: String) {
-        API.shared.searchAppsotre(by: keyword)
-            .observeOn(ConcurrentDispatchQueueScheduler(qos: .background))
-            .retry(2)
-            .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { result in
-                Log.verbose("성공")
-            }, onError: { [weak self] error in
-                self?.errorAlert(error)
-            }, onCompleted: {
-                Log.verbose("onCompleted")
-            })
-            .disposed(by: disposeBag)
+    func addRelatedResultVC() {
+        guard !view.subviews.contains(relatedResultVC.view) else {
+            return
+        }
+        Log.verbose("addRelatedResultVC")
+        addChild(relatedResultVC)
+        view.addSubview(relatedResultVC.view)
+        relatedResultVC.didMove(toParent: self)
     }
 }
 
 //- MARK: TableView
 extension SearchViewController {
+    
     func dataBinding() {
         dataSource
             .asDriver()
@@ -85,32 +73,11 @@ extension SearchViewController {
                 cell?.setSelected(false, animated: true)
             }
             .disposed(by: disposeBag)
-        
     }
 }
 
 //- MARK: SearchBar
 extension SearchViewController {
-    
-    func removeJamo(to text: String) -> String {
-        let jamo: [Character] = [
-            "ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ",
-            "ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ",
-            
-            "ㄳ","ㄵ","ㄶ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅄ",
-            
-            "ㅏ", "ㅐ", "ㅑ", "ㅒ", "ㅓ", "ㅔ","ㅕ", "ㅖ", "ㅗ", "ㅘ",
-            "ㅙ", "ㅚ","ㅛ", "ㅜ", "ㅝ", "ㅞ", "ㅟ", "ㅠ", "ㅡ", "ㅢ",
-            "ㅣ"
-        ]
-        
-        var result: String = ""
-        for case let unit in Array(text) where !jamo.contains(unit) {
-            result.append(unit)
-        }
-        
-        return result
-    }
     
     func saveSearchText(_ text: String) {
         guard !text.isEmpty else { return }
@@ -120,14 +87,23 @@ extension SearchViewController {
     }
     
     func hangulWarningAlert() {
-        let alert = simpleAlert(message: "한글만 입력 가능합니다.")
+        let alert = UIAlertController(title: "",
+                                      message: "한글만 입력 가능합니다.",
+                                      preferredStyle: .alert)
+        
+        let okAction = UIAlertAction(title: "확인", style: .cancel) { [weak self] _ in
+            self?.searchController.searchBar.becomeFirstResponder()
+        }
+        
+        alert.addAction(okAction)
+        
         present(alert, animated: true) { [weak self] in
             self?.searchController.searchBar.text = ""
         }
     }
     
     func isHangul(_ searchText: String) -> Bool {
-        let hangul = searchText.isHangul()
+        let hangul = searchText.isEmpty ? true : searchText.isHangul()
         if !hangul {
             hangulWarningAlert()
         }
@@ -135,6 +111,15 @@ extension SearchViewController {
         return hangul
     }
     
+    func searchRelatedResult(with text: String) {
+        if text.isEmpty  {
+            removeRelatedResultVC()
+        } else {
+            addRelatedResultVC()
+            relatedResultVC.rx_searchText.accept(text)
+        }
+    }
+ 
     func searchBarEditing() {
         searchController.searchBar
             .rx.text
@@ -146,6 +131,7 @@ extension SearchViewController {
             }
             .bind { [unowned self] searchText in
                 Log.debug(searchText)
+                self.searchRelatedResult(with: searchText)
                 self.navigationBarShadow(isHidden: searchText.isEmpty)
             }
             .disposed(by: disposeBag)
@@ -159,6 +145,7 @@ extension SearchViewController {
                 Log.verbose("Enter")
                 let text = self.searchController.searchBar.text ?? ""
                 self.saveSearchText(text)
+                self.removeRelatedResultVC()
             })
             .disposed(by: disposeBag)
     }
@@ -168,8 +155,10 @@ extension SearchViewController {
             .rx.cancelButtonClicked
             .asDriver()
             .drive(onNext: { [unowned self] in
-               Log.verbose("Cancel")
+                Log.verbose("Cancel")
                 self.navigationBarShadow(isHidden: true)
+                self.searchController.searchBar.resignFirstResponder()
+                self.removeRelatedResultVC()
             })
             .disposed(by: disposeBag)
     }
@@ -187,13 +176,14 @@ class SearchViewController: UIViewController {
     @IBOutlet weak var searchHistoryTitleLabel: UILabel!
     
     let disposeBag = DisposeBag()
+    
+    lazy var relatedResultVC = RelatedResultViewController.instantiateVC()
     lazy var searchController = UISearchController(searchResultsController: nil)
     
     var dataSource = BehaviorRelay(value: SearchHistory.get())
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         navigationBarShadow(isHidden: true)
         setSearchHistoryTableView()
         setSearchController()
