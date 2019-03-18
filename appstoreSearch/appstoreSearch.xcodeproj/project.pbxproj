@@ -27,6 +27,10 @@
 		DB946DA7223CF3590053DBE2 /* appstoreSearchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB946DA6223CF3590053DBE2 /* appstoreSearchUITests.swift */; };
 		DB9EF158223F895A004962CB /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9EF157223F895A004962CB /* SearchResultCell.swift */; };
 		DB9EF15A223F89D3004962CB /* SearchResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9EF159223F89D3004962CB /* SearchResultViewController.swift */; };
+		DBB3E7A42240075100E6ED2D /* CollectionExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB3E7A32240075100E6ED2D /* CollectionExtensions.swift */; };
+		DBB3E7A622401AF700E6ED2D /* IntExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB3E7A522401AF700E6ED2D /* IntExtensions.swift */; };
+		DBB3E7A822401DAD00E6ED2D /* DoubleExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB3E7A722401DAD00E6ED2D /* DoubleExtensions.swift */; };
+		DBB3E7AA2240273300E6ED2D /* UIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB3E7A92240273300E6ED2D /* UIExtensions.swift */; };
 		F33860D58216106F6300750E /* Pods_appstoreSearchTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F142766CA3B8E7E86A55EC8F /* Pods_appstoreSearchTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -79,6 +83,10 @@
 		DB946DB4223CF51D0053DBE2 /* appstoreSearch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = appstoreSearch.entitlements; sourceTree = "<group>"; };
 		DB9EF157223F895A004962CB /* SearchResultCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultCell.swift; sourceTree = "<group>"; };
 		DB9EF159223F89D3004962CB /* SearchResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultViewController.swift; sourceTree = "<group>"; };
+		DBB3E7A32240075100E6ED2D /* CollectionExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtensions.swift; sourceTree = "<group>"; };
+		DBB3E7A522401AF700E6ED2D /* IntExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntExtensions.swift; sourceTree = "<group>"; };
+		DBB3E7A722401DAD00E6ED2D /* DoubleExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoubleExtensions.swift; sourceTree = "<group>"; };
+		DBB3E7A92240273300E6ED2D /* UIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIExtensions.swift; sourceTree = "<group>"; };
 		DEB9159E0F2D38C47CF06289 /* Pods-appstoreSearchUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-appstoreSearchUITests.release.xcconfig"; path = "Target Support Files/Pods-appstoreSearchUITests/Pods-appstoreSearchUITests.release.xcconfig"; sourceTree = "<group>"; };
 		F142766CA3B8E7E86A55EC8F /* Pods_appstoreSearchTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_appstoreSearchTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FDEC759BB4BEF8C7B4305896 /* Pods-appstoreSearch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-appstoreSearch.release.xcconfig"; path = "Target Support Files/Pods-appstoreSearch/Pods-appstoreSearch.release.xcconfig"; sourceTree = "<group>"; };
@@ -182,6 +190,10 @@
 			isa = PBXGroup;
 			children = (
 				DB8B6C08223E7DB900BDDB18 /* StringExtensions.swift */,
+				DBB3E7A32240075100E6ED2D /* CollectionExtensions.swift */,
+				DBB3E7A522401AF700E6ED2D /* IntExtensions.swift */,
+				DBB3E7A722401DAD00E6ED2D /* DoubleExtensions.swift */,
+				DBB3E7A92240273300E6ED2D /* UIExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -496,6 +508,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBB3E7A622401AF700E6ED2D /* IntExtensions.swift in Sources */,
 				DB8B6BFD223D4DC900BDDB18 /* Logger.swift in Sources */,
 				DB8B6C0E223E9AFB00BDDB18 /* RelatedResultCell.swift in Sources */,
 				DB946D89223CF3540053DBE2 /* SearchViewController.swift in Sources */,
@@ -505,8 +518,11 @@
 				DB8B6C0C223E97E600BDDB18 /* RelatedResultViewController.swift in Sources */,
 				DB8B6BF9223D4C2C00BDDB18 /* APIError.swift in Sources */,
 				DB8B6BF7223D025900BDDB18 /* SerachResult.swift in Sources */,
+				DBB3E7A42240075100E6ED2D /* CollectionExtensions.swift in Sources */,
 				DB8B6C05223E72C400BDDB18 /* HistoryCell.swift in Sources */,
+				DBB3E7A822401DAD00E6ED2D /* DoubleExtensions.swift in Sources */,
 				DB9EF158223F895A004962CB /* SearchResultCell.swift in Sources */,
+				DBB3E7AA2240273300E6ED2D /* UIExtensions.swift in Sources */,
 				DB9EF15A223F89D3004962CB /* SearchResultViewController.swift in Sources */,
 				DB946D87223CF3540053DBE2 /* AppDelegate.swift in Sources */,
 			);

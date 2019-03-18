@@ -55,4 +55,30 @@ extension String {
         
         return result
     }
+    
+    var insertComma: String {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.groupingSeparator = ","
+        
+        var numberArray = self.components(separatedBy: ".")
+        
+        if numberArray.count == 1 {
+            let numberString = numberArray[0].replacingOccurrences(of: ",", with: "")
+            
+            guard let doubleValue = Double(numberString) else { return self }
+            
+            return numberFormatter.string(from: NSNumber(value: doubleValue)) ?? self
+            
+        } else if numberArray.count == 2 {
+            let numberString = numberArray[0]
+            guard let doubleValue = Double(numberString) else { return self }
+            
+            return (numberFormatter.string(from: NSNumber(value: doubleValue)) ?? numberString) + ".\(numberArray[1])"
+        }else{
+            guard let doubleValue = Double(self) else { return self }
+            
+            return numberFormatter.string(from: NSNumber(value: doubleValue)) ?? self
+        }
+    }
 }

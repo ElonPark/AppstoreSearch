@@ -17,15 +17,88 @@ extension SearchResultCell {
         appIconImageView.image = nil
         titleLabel.text = ""
         subTitleLabel.text = ""
+        starRatingView.isHidden = true
+        ratingLabel.text = ""
+        
+        for screenShotView in screenShotImageViews {
+            screenShotView.isHidden = false
+        }
+    }
+    
+    func setTitleLabel(text: String) {
+        titleLabel.text = text
+    }
+    
+    func setSubTitleLabel(text: String?) {
+        subTitleLabel.text = text
+    }
+    
+    func setStarRating(value: Double?) {
+        starRatingView.isHidden = value == nil ? true : false
+        guard let averageUserRating = value else { return }
+        starRatingView.settings.fillMode = .precise
+        starRatingView.settings.updateOnTouch = false
+        starRatingView.rating = averageUserRating
+    }
+    
+    func setRatingLabel(value: Int?) {
+        guard let userRatingCount = value else { return }
+        let ratingCountText = { (number: Double) -> String in
+            var count = Double(userRatingCount) / number
+            count = count.rounded(toPlaces: 2, rule: .up)
+            
+            return count.withCommas()
+        }
+        
+        var ratingText = String(userRatingCount)
+        
+        if userRatingCount > 10000 {
+            ratingText = "\(ratingCountText(10000.0))만"
+        } else if userRatingCount > 1000 {
+            ratingText = "\(ratingCountText(1000.0))천"
+        }
+        
+        ratingLabel.text = ratingText
+    }
+    
+    private func setScreenShot(_ index: Int, by urlString: String) {
+        API.shared.requestImage(urlString: urlString)
+            .observeOn(ConcurrentDispatchQueueScheduler(qos: .background))
+            .retry(2)
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { [weak self] imageData in
+                let image = UIImage(data: imageData)
+                self?.screenShotImageViews[safe: index]?.image = image
+                self?.screenShotImageViews[safe: index]?.isHidden = false
+            }, onError: { error in
+                Log.error(error.localizedDescription)
+            })
+            .disposed(by: disposeBag)
     }
     
     func setScreenShotImageViews(by urlStrings: [String]) {
-        
+        for index in 0..<screenShotImageViews.count {
+            let imageView = screenShotImageViews[index]
+            if let urlString = urlStrings[safe: index] {
+                setScreenShot(index, by: urlString)
+            } else {
+                imageView.isHidden = true
+            }
+        }
     }
     
+    func setUI(with model: ResultElement) {
+        resultElement = model
+        
+        setTitleLabel(text: model.trackName)
+        setSubTitleLabel(text: model.genres[safe: 0])
+        setStarRating(value: model.averageUserRating)
+        setRatingLabel(value: model.userRatingCount)
+        setScreenShotImageViews(by: model.screenshotURLs)
+    }
     
     ///다운로드를 누르면 앱스토어 앱 상세페이지로 이동
-    func downlaod() {
+    func rx_downlaod() {
         downloadButton
             .rx.tap
             .throttle(0.5, scheduler: MainScheduler.instance)
@@ -37,7 +110,6 @@ extension SearchResultCell {
             }
             .disposed(by: disposeBag)
     }
-    
 }
 
 class SearchResultCell: UITableViewCell {
@@ -74,5 +146,4 @@ class SearchResultCell: UITableViewCell {
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
-
 }

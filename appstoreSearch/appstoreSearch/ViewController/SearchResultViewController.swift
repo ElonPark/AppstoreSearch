@@ -70,6 +70,8 @@ extension SearchResultViewController {
                 cellIdentifier: SearchResultCell.identifier,
                 cellType: SearchResultCell.self)) { row, model, cell in
                     Log.verbose(model.trackName)
+                    cell.setUI(with: model)
+                    cell.rx_downlaod()
             }
             .disposed(by: disposeBag)
     }
