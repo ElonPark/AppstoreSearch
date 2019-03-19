@@ -31,6 +31,8 @@
 		DBB3E7A622401AF700E6ED2D /* IntExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB3E7A522401AF700E6ED2D /* IntExtensions.swift */; };
 		DBB3E7A822401DAD00E6ED2D /* DoubleExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB3E7A722401DAD00E6ED2D /* DoubleExtensions.swift */; };
 		DBB3E7AA2240273300E6ED2D /* UIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB3E7A92240273300E6ED2D /* UIExtensions.swift */; };
+		DBB3E7AC2240C81300E6ED2D /* ResultTypeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB3E7AB2240C81300E6ED2D /* ResultTypeController.swift */; };
+		DBB3E7AF2240D40A00E6ED2D /* ResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB3E7AE2240D40A00E6ED2D /* ResultsViewController.swift */; };
 		F33860D58216106F6300750E /* Pods_appstoreSearchTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F142766CA3B8E7E86A55EC8F /* Pods_appstoreSearchTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -87,6 +89,8 @@
 		DBB3E7A522401AF700E6ED2D /* IntExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntExtensions.swift; sourceTree = "<group>"; };
 		DBB3E7A722401DAD00E6ED2D /* DoubleExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoubleExtensions.swift; sourceTree = "<group>"; };
 		DBB3E7A92240273300E6ED2D /* UIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIExtensions.swift; sourceTree = "<group>"; };
+		DBB3E7AB2240C81300E6ED2D /* ResultTypeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultTypeController.swift; sourceTree = "<group>"; };
+		DBB3E7AE2240D40A00E6ED2D /* ResultsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsViewController.swift; sourceTree = "<group>"; };
 		DEB9159E0F2D38C47CF06289 /* Pods-appstoreSearchUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-appstoreSearchUITests.release.xcconfig"; path = "Target Support Files/Pods-appstoreSearchUITests/Pods-appstoreSearchUITests.release.xcconfig"; sourceTree = "<group>"; };
 		F142766CA3B8E7E86A55EC8F /* Pods_appstoreSearchTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_appstoreSearchTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FDEC759BB4BEF8C7B4305896 /* Pods-appstoreSearch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-appstoreSearch.release.xcconfig"; path = "Target Support Files/Pods-appstoreSearch/Pods-appstoreSearch.release.xcconfig"; sourceTree = "<group>"; };
@@ -133,13 +137,13 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		DB8B6BF5223D024000BDDB18 /* Models */ = {
+		DB8B6BF5223D024000BDDB18 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				DB8B6BF6223D025900BDDB18 /* SerachResult.swift */,
 				DB8B6C01223E690000BDDB18 /* SearchHistory.swift */,
 			);
-			path = Models;
+			path = Model;
 			sourceTree = "<group>";
 		};
 		DB8B6BFA223D4D8100BDDB18 /* Error */ = {
@@ -180,13 +184,12 @@
 			isa = PBXGroup;
 			children = (
 				DB946D88223CF3540053DBE2 /* SearchViewController.swift */,
-				DB8B6C0B223E97E600BDDB18 /* RelatedResultViewController.swift */,
-				DB9EF159223F89D3004962CB /* SearchResultViewController.swift */,
+				DBB3E7B02240D45600E6ED2D /* Results */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
 		};
-		DB8B6C07223E7D9A00BDDB18 /* Extensions */ = {
+		DB8B6C07223E7D9A00BDDB18 /* Extension */ = {
 			isa = PBXGroup;
 			children = (
 				DB8B6C08223E7DB900BDDB18 /* StringExtensions.swift */,
@@ -195,7 +198,7 @@
 				DBB3E7A722401DAD00E6ED2D /* DoubleExtensions.swift */,
 				DBB3E7A92240273300E6ED2D /* UIExtensions.swift */,
 			);
-			path = Extensions;
+			path = Extension;
 			sourceTree = "<group>";
 		};
 		DB946D7A223CF3540053DBE2 = {
@@ -223,10 +226,10 @@
 		DB946D85223CF3540053DBE2 /* appstoreSearch */ = {
 			isa = PBXGroup;
 			children = (
-				DB8B6C07223E7D9A00BDDB18 /* Extensions */,
+				DB8B6C07223E7D9A00BDDB18 /* Extension */,
 				DB8B6BFB223D4DC900BDDB18 /* Logger */,
 				DB8B6BFA223D4D8100BDDB18 /* Error */,
-				DB8B6BF5223D024000BDDB18 /* Models */,
+				DB8B6BF5223D024000BDDB18 /* Model */,
 				DB8B6BFE223D4DF800BDDB18 /* Network */,
 				DB8B6C03223E727200BDDB18 /* Cell */,
 				DB8B6C06223E7C5E00BDDB18 /* ViewController */,
@@ -256,6 +259,17 @@
 				DB946DA8223CF3590053DBE2 /* Info.plist */,
 			);
 			path = appstoreSearchUITests;
+			sourceTree = "<group>";
+		};
+		DBB3E7B02240D45600E6ED2D /* Results */ = {
+			isa = PBXGroup;
+			children = (
+				DBB3E7AB2240C81300E6ED2D /* ResultTypeController.swift */,
+				DB8B6C0B223E97E600BDDB18 /* RelatedResultViewController.swift */,
+				DB9EF159223F89D3004962CB /* SearchResultViewController.swift */,
+				DBB3E7AE2240D40A00E6ED2D /* ResultsViewController.swift */,
+			);
+			path = Results;
 			sourceTree = "<group>";
 		};
 		EF779C220BDB51E3C5EE02E9 /* Frameworks */ = {
@@ -510,6 +524,8 @@
 			files = (
 				DBB3E7A622401AF700E6ED2D /* IntExtensions.swift in Sources */,
 				DB8B6BFD223D4DC900BDDB18 /* Logger.swift in Sources */,
+				DBB3E7AF2240D40A00E6ED2D /* ResultsViewController.swift in Sources */,
+				DBB3E7AC2240C81300E6ED2D /* ResultTypeController.swift in Sources */,
 				DB8B6C0E223E9AFB00BDDB18 /* RelatedResultCell.swift in Sources */,
 				DB946D89223CF3540053DBE2 /* SearchViewController.swift in Sources */,
 				DB8B6C00223D4E4200BDDB18 /* API.swift in Sources */,

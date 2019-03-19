@@ -16,6 +16,9 @@ extension SearchResultViewController {
     func setSearchResultTableView() {
         searchResultTableView.delegate = nil
         searchResultTableView.dataSource = nil
+
+        searchResultTableView.rowHeight = UITableView.automaticDimension
+        searchResultTableView.estimatedRowHeight = 310
     }
     
     func errorAlert(_ error: Error) {
@@ -33,8 +36,14 @@ extension SearchResultViewController {
     }
     
     func updateDataSource(by result: Result) {
-        searchResultTableView.isHidden = result.resultCount > 0
+        searchResult = result
         dataSource.accept(result.results)
+    }
+    
+    func showResultEmptyViewIfNeeded() {
+        let resultCount = searchResult?.resultCount ?? 0
+        searchResultTableView.isHidden = resultCount < 1
+        resultEmptyView.isHidden = resultCount > 0
     }
     
     func search(by keyword: String) {
@@ -46,20 +55,24 @@ extension SearchResultViewController {
                 Log.verbose("성공")
                 self?.updateDataSource(by: result)
             }, onError: { [weak self] error in
-                self?.errorAlert(error)
-                }, onCompleted: {
+                Log.error(error.localizedDescription, error)
+                self?.searchResult = nil
+                self?.showResultEmptyViewIfNeeded()
+                }, onCompleted: { [weak self] in
                     Log.verbose("onCompleted")
+                    self?.showResultEmptyViewIfNeeded()
             })
             .disposed(by: disposeBag)
     }
     
     func searchText() {
         rx_searchText
-            .asDriver()
-            .drive(onNext: { [unowned self] text in
+            .distinctUntilChanged()
+            .observeOn(MainScheduler.instance)
+            .bind { [unowned self] text in
                 self.setResultEmptyView(with: text)
                 self.search(by: text)
-            })
+            }
             .disposed(by: disposeBag)
     }
     
@@ -69,9 +82,7 @@ extension SearchResultViewController {
             .drive(searchResultTableView.rx.items(
                 cellIdentifier: SearchResultCell.identifier,
                 cellType: SearchResultCell.self)) { row, model, cell in
-                    Log.verbose(model.trackName)
                     cell.setUI(with: model)
-                    cell.rx_downlaod()
             }
             .disposed(by: disposeBag)
     }
@@ -82,27 +93,34 @@ extension SearchResultViewController {
             .throttle(0.3, scheduler: MainScheduler.instance)
             .distinctUntilChanged()
             .bind { [unowned self] indexPath in
-                let cell = self.searchResultTableView.cellForRow(at: indexPath) as? SearchResultCell
-                Log.verbose(cell?.titleLabel.text ?? "")
+                let result = self.dataSource.value[indexPath.row]
+                self.selectItem(result)
             }
             .disposed(by: disposeBag)
     }
-    
 }
 
-class SearchResultViewController: UIViewController {
+class SearchResultViewController: ResultTypeController {
 
-    
     @IBOutlet weak var resultEmptyView: UIView!
     @IBOutlet weak var resultEmptyLabel: UILabel!
     @IBOutlet weak var searchTextLabel: UILabel!
     
     @IBOutlet weak var searchResultTableView: UITableView!
     
-
+    var searchResult: Result?
     let disposeBag = DisposeBag()
     let rx_searchText = BehaviorRelay(value: String())
     let dataSource = BehaviorRelay(value: [ResultElement]())
+    
+    
+    class func instantiateVC() -> SearchResultViewController {
+        let identifier = "SearchResultViewController"
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let relatedResultVC = storyboard.instantiateViewController(withIdentifier: identifier)
+        
+        return relatedResultVC as! SearchResultViewController
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -111,5 +129,10 @@ class SearchResultViewController: UIViewController {
         searchText()
         dataBinding()
         selectCellItem()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        searchResultTableView.isHidden = false
     }
 }

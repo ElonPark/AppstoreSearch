@@ -11,13 +11,7 @@ import RxSwift
 import RxCocoa
 
 extension RelatedResultViewController {
-    func remove() {
-        guard parent != nil else { return }
-        willMove(toParent: nil)
-        removeFromParent()
-        view.removeFromSuperview()
-    }
-    
+
     func setRelatedResultTableView() {
         relatedResultTableView.delegate = nil
         relatedResultTableView.dataSource = nil
@@ -25,14 +19,15 @@ extension RelatedResultViewController {
     
     func searchText() {
         rx_searchText
-            .asDriver()
-            .drive(onNext: { [unowned self] text in
+            .distinctUntilChanged()
+            .observeOn(MainScheduler.instance)
+            .bind { [unowned self] text in
                 let history = SearchHistory.get()
                 self.relatedResults = history.filter {
                     $0.hasCaseInsensitivePrefix(text)
                 }
                 self.dataSource.accept(self.relatedResults)
-            })
+            }
             .disposed(by: disposeBag)
     }
     
@@ -54,15 +49,14 @@ extension RelatedResultViewController {
             .throttle(0.3, scheduler: MainScheduler.instance)
             .distinctUntilChanged()
             .bind { [unowned self] indexPath in
-                let cell = self.relatedResultTableView.cellForRow(at: indexPath) as? RelatedResultCell
-                Log.verbose(cell?.titleLabel.text ?? "")
-                cell?.setSelected(false, animated: true)
+                let text = self.dataSource.value[indexPath.row]
+                self.selectItem(text)
             }
             .disposed(by: disposeBag)
     }
 }
 
-class RelatedResultViewController: UIViewController {
+class RelatedResultViewController: ResultTypeController {
 
     @IBOutlet weak var relatedResultTableView: UITableView!
     @IBOutlet weak var tableViewHaderSpaceView: UIView!
@@ -72,7 +66,7 @@ class RelatedResultViewController: UIViewController {
     var relatedResults = [String]()
     lazy var rx_searchText = BehaviorRelay(value: String())
     lazy var dataSource = BehaviorRelay(value: relatedResults)
-    static let seguIdentifier = "RelatedResult"
+   
     
     class func instantiateVC() -> RelatedResultViewController {
         let identifier = "RelatedResultViewController"

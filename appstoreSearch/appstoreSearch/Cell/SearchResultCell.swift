@@ -21,8 +21,29 @@ extension SearchResultCell {
         ratingLabel.text = ""
         
         for screenShotView in screenShotImageViews {
-            screenShotView.isHidden = false
+            screenShotView.image = nil
+            screenShotView.isHidden = true
         }
+    }
+    
+    private func loadImage(to imageView: UIImageView, by urlString: String) {
+        API.shared.requestImage(urlString: urlString)
+            .observeOn(ConcurrentDispatchQueueScheduler(qos: .background))
+            .retry(2)
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { imageData in
+                let image = UIImage(data: imageData)
+                imageView.image = image
+                imageView.isHidden = false
+            }, onError: { error in
+                Log.error(error.localizedDescription, error)
+                imageView.isHidden = true
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func setAppIconImageView(by urlString: String) {
+        loadImage(to: appIconImageView, by: urlString)
     }
     
     func setTitleLabel(text: String) {
@@ -61,40 +82,15 @@ extension SearchResultCell {
         ratingLabel.text = ratingText
     }
     
-    private func setScreenShot(_ index: Int, by urlString: String) {
-        API.shared.requestImage(urlString: urlString)
-            .observeOn(ConcurrentDispatchQueueScheduler(qos: .background))
-            .retry(2)
-            .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { [weak self] imageData in
-                let image = UIImage(data: imageData)
-                self?.screenShotImageViews[safe: index]?.image = image
-                self?.screenShotImageViews[safe: index]?.isHidden = false
-            }, onError: { error in
-                Log.error(error.localizedDescription)
-            })
-            .disposed(by: disposeBag)
-    }
-    
     func setScreenShotImageViews(by urlStrings: [String]) {
         for index in 0..<screenShotImageViews.count {
             let imageView = screenShotImageViews[index]
             if let urlString = urlStrings[safe: index] {
-                setScreenShot(index, by: urlString)
+                loadImage(to: screenShotImageViews[index], by: urlString)
             } else {
                 imageView.isHidden = true
             }
         }
-    }
-    
-    func setUI(with model: ResultElement) {
-        resultElement = model
-        
-        setTitleLabel(text: model.trackName)
-        setSubTitleLabel(text: model.genres[safe: 0])
-        setStarRating(value: model.averageUserRating)
-        setRatingLabel(value: model.userRatingCount)
-        setScreenShotImageViews(by: model.screenshotURLs)
     }
     
     ///다운로드를 누르면 앱스토어 앱 상세페이지로 이동
@@ -104,11 +100,23 @@ extension SearchResultCell {
             .throttle(0.5, scheduler: MainScheduler.instance)
             .bind { [unowned self] in
                 guard let appStoreID = self.resultElement?.trackID else { return }
-                let appStoreURLString = "itms://tunes.apple.com/app/id\(appStoreID)"
+                let appStoreURLString = "itms-apps://tunes.apple.com/app/id\(appStoreID)"
                 guard let url = URL(string: appStoreURLString) else { return }
                 UIApplication.shared.open(url)
             }
             .disposed(by: disposeBag)
+    }
+    
+    func setUI(with model: ResultElement) {
+        resultElement = model
+        setAppIconImageView(by: model.artworkURL100)
+        setTitleLabel(text: model.trackName)
+        setSubTitleLabel(text: model.genres[safe: 0])
+        setStarRating(value: model.averageUserRating)
+        setRatingLabel(value: model.userRatingCount)
+//        setScreenShotImageViews(by: model.screenshotURLs)
+        
+        rx_downlaod()
     }
 }
 

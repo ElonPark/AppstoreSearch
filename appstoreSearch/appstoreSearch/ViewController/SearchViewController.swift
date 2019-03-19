@@ -22,29 +22,48 @@ extension SearchViewController {
     }
     
     func setSearchController() {
-        searchController = UISearchController(searchResultsController: relatedResultVC)
         searchController.searchBar.placeholder = "App Store"
-        searchController.searchBar.searchBarStyle = .minimal
+        searchController.searchBar.setValue("취소", forKey: "_cancelButtonText")
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
         definesPresentationContext = true
     }
-
-    func removeRelatedResultVC() {
-        guard view.subviews.contains(relatedResultVC.view) else {
-            return
-        }
-        relatedResultVC.remove()
+    
+    func setResult(by searchText: String, type: ResultType) {
+        resultVC.result(type: type, with: searchText)
     }
     
-    func addRelatedResultVC() {
-        guard !view.subviews.contains(relatedResultVC.view) else {
-            return
+    func setSearchBar(text: String) {
+        searchController.searchBar.text = text
+        searchController.isActive = true
+        searchController.searchBar.resignFirstResponder()
+    }
+    
+    func relatedResultSelect() {
+        resultVC.relatedResultVC.selectItem = { [weak self] result in
+            guard let text = result as? String else { return }
+            Log.verbose(text)
+            self?.setSearchBar(text: text)
+            self?.setResult(by: text, type: .result)
         }
-        Log.verbose("addRelatedResultVC")
-        addChild(relatedResultVC)
-        view.addSubview(relatedResultVC.view)
-        relatedResultVC.didMove(toParent: self)
+    }
+    
+    func searchResultSelect() {
+        resultVC.searchResultVC.selectItem = { result in
+            guard let element = result as? ResultElement else { return }
+            Log.verbose(element.trackName)
+        }
+    }
+ 
+    func search(by index: IndexPath) {
+        let cell = searchHistoryTableView.cellForRow(at: index) as? HistoryCell
+        cell?.setSelected(false, animated: true)
+        
+        let text = cell?.titleLabel.text ?? ""
+        navigationBarShadow(isHidden: false)
+        setSearchBar(text: text)
+        setResult(by: text, type: .result)
+        Log.verbose(text)
     }
 }
 
@@ -68,9 +87,7 @@ extension SearchViewController {
             .throttle(0.3, scheduler: MainScheduler.instance)
             .distinctUntilChanged()
             .bind { [unowned self] indexPath in
-                let cell = self.searchHistoryTableView.cellForRow(at: indexPath) as? HistoryCell
-                Log.verbose(cell?.titleLabel.text ?? "")
-                cell?.setSelected(false, animated: true)
+                self.search(by: indexPath)
             }
             .disposed(by: disposeBag)
     }
@@ -110,42 +127,34 @@ extension SearchViewController {
         
         return hangul
     }
-    
-    func searchRelatedResult(with text: String) {
-        if text.isEmpty  {
-            removeRelatedResultVC()
-        } else {
-            addRelatedResultVC()
-            relatedResultVC.rx_searchText.accept(text)
-        }
-    }
  
     func searchBarEditing() {
         searchController.searchBar
             .rx.text
             .orEmpty
-            .throttle(0.3, scheduler: MainScheduler.instance)
+            .throttle(0.3, latest: true, scheduler: MainScheduler.instance)
             .distinctUntilChanged()
             .filter { [unowned self] text in
                 self.searchController.isActive && self.isHangul(text)
             }
             .bind { [unowned self] searchText in
-                Log.debug(searchText)
-                self.searchRelatedResult(with: searchText)
                 self.navigationBarShadow(isHidden: searchText.isEmpty)
+                
+                Log.debug(searchText)
+                self.setResult(by: searchText, type: .related)
             }
             .disposed(by: disposeBag)
     }
     
-    func searchBarEndEditing() {
+    func searchButtonClicked() {
         searchController.searchBar
-            .rx.textDidEndEditing
+            .rx.searchButtonClicked
             .asDriver()
             .drive(onNext: { [unowned self] in
                 Log.verbose("Enter")
                 let text = self.searchController.searchBar.text ?? ""
                 self.saveSearchText(text)
-                self.removeRelatedResultVC()
+                self.setResult(by: text, type: .result)
             })
             .disposed(by: disposeBag)
     }
@@ -158,14 +167,12 @@ extension SearchViewController {
                 Log.verbose("Cancel")
                 self.navigationBarShadow(isHidden: true)
                 self.searchController.searchBar.resignFirstResponder()
-                self.removeRelatedResultVC()
             })
             .disposed(by: disposeBag)
     }
 }
 
 
-//TODO: 검색시 연관검색어 대신 히스토리에서 검색하여 표시
 //TODO: 검색 결과 화면은 스크린샷과 동일하게 구현
 //TODO: 상세 화면은 제공되는 API내에서 최대한 구현
 
@@ -174,16 +181,17 @@ class SearchViewController: UIViewController {
     @IBOutlet weak var searchHistoryTableView: UITableView!
     @IBOutlet weak var searchHistoryTitleView: UIView!
     @IBOutlet weak var searchHistoryTitleLabel: UILabel!
-    
+
     let disposeBag = DisposeBag()
     
-    lazy var relatedResultVC = RelatedResultViewController.instantiateVC()
-    lazy var searchController = UISearchController(searchResultsController: nil)
+    lazy var resultVC = ResultsViewController()
+    lazy var searchController = UISearchController(searchResultsController: resultVC)
     
     var dataSource = BehaviorRelay(value: SearchHistory.get())
     
     override func viewDidLoad() {
         super.viewDidLoad()
+    
         navigationBarShadow(isHidden: true)
         setSearchHistoryTableView()
         setSearchController()
@@ -192,8 +200,11 @@ class SearchViewController: UIViewController {
         selectCellItem()
         
         searchBarEditing()
-        searchBarEndEditing()
+        searchButtonClicked()
         searchBarCancel()
+        
+        relatedResultSelect()
+        searchResultSelect()
     }
 }
 
