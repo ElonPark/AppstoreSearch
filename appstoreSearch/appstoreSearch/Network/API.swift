@@ -24,7 +24,6 @@ class API {
     
     private func requsetURL(_ urlString: String, with parameters: [String : String]? = nil) -> URL? {
         var urlComponents = URLComponents(string: urlString)
-        urlComponents?.path = endpoint
         
         if let _parameters = parameters {
            let query = _parameters.map {
@@ -48,7 +47,7 @@ class API {
             "country" : "kr"
         ]
         
-        let url = requsetURL(hostURL, with: parameter)
+        let url = requsetURL(hostURL + endpoint, with: parameter)
         
         //네트워크 관련 라이브러리 사용 제한
         //URLSession.shared.rx.json(url: url)
@@ -115,7 +114,7 @@ class API {
             defer {
                 completion(responseData, error)
             }
-            
+    
             guard requsetError == nil else {
                 error = requsetError
                 return
