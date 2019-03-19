@@ -30,7 +30,7 @@ extension SearchViewController {
     }
     
     func setResult(by searchText: String, type: ResultType) {
-        resultVC.result(type: type, with: searchText)
+        searchResultsVC.result(type: type, with: searchText)
     }
     
     func setSearchBar(text: String) {
@@ -40,7 +40,7 @@ extension SearchViewController {
     }
     
     func relatedResultSelect() {
-        resultVC.relatedResultVC.selectItem = { [weak self] result in
+        searchResultsVC.relatedKeywordsVC.selectItem = { [weak self] result in
             guard let text = result as? String else { return }
             Log.verbose(text)
             self?.setSearchBar(text: text)
@@ -49,7 +49,7 @@ extension SearchViewController {
     }
     
     func searchResultSelect() {
-        resultVC.searchResultVC.selectItem = { result in
+        searchResultsVC.appResultsVC.selectItem = { result in
             guard let element = result as? ResultElement else { return }
             Log.verbose(element.trackName)
         }
@@ -184,8 +184,8 @@ class SearchViewController: UIViewController {
 
     let disposeBag = DisposeBag()
     
-    lazy var resultVC = ResultsViewController()
-    lazy var searchController = UISearchController(searchResultsController: resultVC)
+    lazy var searchResultsVC = SearchResultsViewController()
+    lazy var searchController = UISearchController(searchResultsController: searchResultsVC)
     
     var dataSource = BehaviorRelay(value: SearchHistory.get())
     

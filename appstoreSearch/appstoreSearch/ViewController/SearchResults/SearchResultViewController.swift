@@ -1,5 +1,5 @@
 //
-//  SearchResultViewController.swift
+//  AppResultsViewController.swift
 //  appstoreSearch
 //
 //  Created by Elon on 18/03/2019.
@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 
 
-extension SearchResultViewController {
+extension AppResultsViewController {
     
     func setSearchResultTableView() {
         searchResultTableView.delegate = nil
@@ -100,7 +100,7 @@ extension SearchResultViewController {
     }
 }
 
-class SearchResultViewController: ResultTypeController {
+class AppResultsViewController: ResultTypeController {
 
     @IBOutlet weak var resultEmptyView: UIView!
     @IBOutlet weak var resultEmptyLabel: UILabel!
@@ -114,12 +114,12 @@ class SearchResultViewController: ResultTypeController {
     let dataSource = BehaviorRelay(value: [ResultElement]())
     
     
-    class func instantiateVC() -> SearchResultViewController {
-        let identifier = "SearchResultViewController"
+    class func instantiateVC() -> AppResultsViewController {
+        let identifier = "AppResultsViewController"
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let relatedResultVC = storyboard.instantiateViewController(withIdentifier: identifier)
         
-        return relatedResultVC as! SearchResultViewController
+        return relatedResultVC as! AppResultsViewController
     }
     
     override func viewDidLoad() {

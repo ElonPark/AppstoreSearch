@@ -8,6 +8,10 @@
 
 import UIKit
 
+enum ResultType {
+    case related
+    case result
+}
 
 class ResultTypeController: UIViewController {
     var selectItem: (Any) -> Void = { _ in }
@@ -15,6 +19,7 @@ class ResultTypeController: UIViewController {
     func add(to parent: UIViewController) {
         parent.addChild(self)
         parent.view.addSubview(self.view)
+        self.view.autoresizingMask = [ .flexibleWidth, .flexibleWidth ]
         self.didMove(toParent: parent)
     }
     

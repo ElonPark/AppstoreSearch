@@ -1,5 +1,5 @@
 //
-//  RelatedResultViewController.swift
+//  RelatedKeywordsViewController.swift
 //  appstoreSearch
 //
 //  Created by Elon on 17/03/2019.
@@ -10,7 +10,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-extension RelatedResultViewController {
+extension RelatedKeywordsViewController {
 
     func setRelatedResultTableView() {
         relatedResultTableView.delegate = nil
@@ -56,7 +56,7 @@ extension RelatedResultViewController {
     }
 }
 
-class RelatedResultViewController: ResultTypeController {
+class RelatedKeywordsViewController: ResultTypeController {
 
     @IBOutlet weak var relatedResultTableView: UITableView!
     @IBOutlet weak var tableViewHaderSpaceView: UIView!
@@ -68,12 +68,12 @@ class RelatedResultViewController: ResultTypeController {
     lazy var dataSource = BehaviorRelay(value: relatedResults)
    
     
-    class func instantiateVC() -> RelatedResultViewController {
-        let identifier = "RelatedResultViewController"
+    class func instantiateVC() -> RelatedKeywordsViewController {
+        let identifier = "RelatedKeywordsViewController"
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let relatedResultVC = storyboard.instantiateViewController(withIdentifier: identifier)
         
-        return relatedResultVC as! RelatedResultViewController
+        return relatedResultVC as! RelatedKeywordsViewController
     }
     
     override func viewDidLoad() {

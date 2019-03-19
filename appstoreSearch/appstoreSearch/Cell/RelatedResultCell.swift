@@ -37,6 +37,7 @@ class RelatedResultCell: UITableViewCell {
 
     @IBOutlet weak var searchIconImageView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var lineView: UIView!
     
     
     static let identifier = "RelatedResultCell"

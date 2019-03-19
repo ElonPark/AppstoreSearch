@@ -1,5 +1,5 @@
 //
-//  ResultsViewController.swift
+//  SearchResultsViewController.swift
 //  appstoreSearch
 //
 //  Created by Elon on 19/03/2019.
@@ -8,17 +8,13 @@
 
 import UIKit
 
-enum ResultType {
-    case related
-    case result
-}
 
-class ResultsViewController: UIViewController {
+class SearchResultsViewController: UIViewController {
 
     var currentVC: ResultTypeController?
     
-    lazy var relatedResultVC = RelatedResultViewController.instantiateVC()
-    lazy var searchResultVC = SearchResultViewController.instantiateVC()
+    lazy var relatedKeywordsVC = RelatedKeywordsViewController.instantiateVC()
+    lazy var appResultsVC = AppResultsViewController.instantiateVC()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,12 +30,12 @@ class ResultsViewController: UIViewController {
         Log.verbose(type)
         switch type {
         case .related:
-            change(vc: relatedResultVC)
-            relatedResultVC.rx_searchText.accept(searchText)
+            change(vc: relatedKeywordsVC)
+            relatedKeywordsVC.rx_searchText.accept(searchText)
             
         case .result:
-            change(vc: searchResultVC)
-            searchResultVC.rx_searchText.accept(searchText)
+            change(vc: appResultsVC)
+            appResultsVC.rx_searchText.accept(searchText)
         }
     }
 }

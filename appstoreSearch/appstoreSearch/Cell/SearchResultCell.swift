@@ -114,7 +114,7 @@ extension SearchResultCell {
         setSubTitleLabel(text: model.genres[safe: 0])
         setStarRating(value: model.averageUserRating)
         setRatingLabel(value: model.userRatingCount)
-//        setScreenShotImageViews(by: model.screenshotURLs)
+        setScreenShotImageViews (by: model.screenshotURLs)
         
         rx_downlaod()
     }
