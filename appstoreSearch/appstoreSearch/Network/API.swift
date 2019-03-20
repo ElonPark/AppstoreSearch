@@ -42,7 +42,7 @@ class API {
             "term" : keyword,
             "media" : "software",
             "entity" : "software",
-            "limit" : "20",
+            "limit" : "10",
             "lang" : "ko_kr",
             "country" : "kr"
         ]

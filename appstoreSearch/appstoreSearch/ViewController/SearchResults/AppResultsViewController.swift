@@ -91,12 +91,13 @@ extension AppResultsViewController {
     func selectCellItem() {
         searchResultTableView
             .rx.itemSelected
-            .throttle(0.3, scheduler: MainScheduler.instance)
-            .distinctUntilChanged()
-            .bind { [unowned self] indexPath in
+            .asDriver()
+            .drive(onNext: { [unowned self] indexPath in
                 let result = self.dataSource.value[indexPath.row]
                 self.selectItem(result)
-            }
+                let cell = self.searchResultTableView.cellForRow(at: indexPath) as? SearchResultCell
+                cell?.setSelected(false, animated: true)
+            })
             .disposed(by: disposeBag)
     }
 }
@@ -109,8 +110,9 @@ class AppResultsViewController: ResultTypeController {
     
     @IBOutlet weak var searchResultTableView: UITableView!
     
-    var searchResult: Result?
     let disposeBag = DisposeBag()
+    
+    var searchResult: Result?
     let rx_searchText = BehaviorRelay(value: String())
     let dataSource = BehaviorRelay(value: [ResultElement]())
     
@@ -134,5 +136,6 @@ class AppResultsViewController: ResultTypeController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        resultEmptyView.isHidden = true
     }
 }

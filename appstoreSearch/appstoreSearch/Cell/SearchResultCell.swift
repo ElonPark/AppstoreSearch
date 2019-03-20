@@ -22,28 +22,13 @@ extension SearchResultCell {
         
         for screenShotView in screenShotImageViews {
             screenShotView.image = nil
-            screenShotView.isHidden = true
         }
     }
     
-    private func loadImage(to imageView: UIImageView, by urlString: String) {
-        API.shared.requestImage(urlString: urlString)
-            .observeOn(ConcurrentDispatchQueueScheduler(qos: .background))
-            .retry(2)
-            .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { imageData in
-                let image = UIImage(data: imageData)
-                imageView.image = image
-                imageView.isHidden = false
-            }, onError: { error in
-                Log.error(error.localizedDescription, error)
-                imageView.isHidden = true
-            })
-            .disposed(by: disposeBag)
-    }
-    
     func setAppIconImageView(by urlString: String) {
-        loadImage(to: appIconImageView, by: urlString)
+        appIconImageView
+            .rx_setImage(by: urlString)
+            .disposed(by: disposeBag)
     }
     
     func setTitleLabel(text: String) {
@@ -82,11 +67,15 @@ extension SearchResultCell {
         ratingLabel.text = ratingText
     }
     
+    ///TODO: 이미지 로딩 개선
+    ///FIXME: 이미지 크기에 따라 스택뷰 조절
     func setScreenShotImageViews(by urlStrings: [String]) {
         for index in 0..<screenShotImageViews.count {
             let imageView = screenShotImageViews[index]
             if let urlString = urlStrings[safe: index] {
-                loadImage(to: screenShotImageViews[index], by: urlString)
+                imageView
+                    .rx_setImage(by: urlString)
+                    .disposed(by: disposeBag)
             } else {
                 imageView.isHidden = true
             }

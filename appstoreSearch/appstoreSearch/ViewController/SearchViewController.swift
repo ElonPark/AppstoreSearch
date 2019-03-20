@@ -12,6 +12,11 @@ import RxCocoa
 
 extension SearchViewController {
     
+    func setRrefersLargeTitles() {
+        let navigationBar = navigationController?.navigationBar
+        navigationBar?.prefersLargeTitles = true
+    }
+    
     func navigationBarShadow(isHidden: Bool) {
         navigationController?.navigationBar.setValue(isHidden, forKey: "hidesShadow")
     }
@@ -29,14 +34,13 @@ extension SearchViewController {
         definesPresentationContext = true
     }
     
-    func setResult(by searchText: String, type: ResultType) {
-        searchResultsVC.result(type: type, with: searchText)
-    }
-    
-    func setSearchBar(text: String) {
-        searchController.searchBar.text = text
-        searchController.isActive = true
-        searchController.searchBar.resignFirstResponder()
+    ///TODO: 앱 상세 보기
+    func moveAppDetailVC(with model: ResultElement) {
+        let appDetailVC = AppDetailViewController.instantiateVC()
+        appDetailVC.searchResult = model
+        appDetailVC.dataSource.accept([model])
+        navigationController?.pushViewController(appDetailVC,
+                                                 animated: true)
     }
     
     func relatedResultSelect() {
@@ -49,10 +53,23 @@ extension SearchViewController {
     }
     
     func searchResultSelect() {
-        searchResultsVC.appResultsVC.selectItem = { result in
+        searchResultsVC.appResultsVC.selectItem = { [weak self] result in
             guard let element = result as? ResultElement else { return }
             Log.verbose(element.trackName)
+            self?.moveAppDetailVC(with: element)
         }
+    }
+    
+    func setSearchBar(text: String) {
+        searchController.searchBar.text = text
+        searchController.isActive = true
+        searchController.searchBar.resignFirstResponder()
+    }
+    
+    func setResult(by searchText: String, type: ResultType) {
+        searchResultsVC.result(type: type, with: searchText)
+        relatedResultSelect()
+        searchResultSelect()
     }
  
     func search(by index: IndexPath) {
@@ -61,8 +78,10 @@ extension SearchViewController {
         
         let text = cell?.titleLabel.text ?? ""
         navigationBarShadow(isHidden: false)
+        saveSearchText(text)
         setSearchBar(text: text)
         setResult(by: text, type: .result)
+        
         Log.verbose(text)
     }
 }
@@ -84,11 +103,12 @@ extension SearchViewController {
     func selectCellItem() {
         searchHistoryTableView
             .rx.itemSelected
-            .throttle(0.3, scheduler: MainScheduler.instance)
-            .distinctUntilChanged()
-            .bind { [unowned self] indexPath in
+            .asDriver()
+            .drive(onNext: { [unowned self] indexPath in
                 self.search(by: indexPath)
-            }
+                let cell = self.searchHistoryTableView.cellForRow(at: indexPath) as? HistoryCell
+                cell?.setSelected(false, animated: true)
+            })
             .disposed(by: disposeBag)
     }
 }
@@ -202,9 +222,15 @@ class SearchViewController: UIViewController {
         searchBarEditing()
         searchButtonClicked()
         searchBarCancel()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setRrefersLargeTitles()
         
-        relatedResultSelect()
-        searchResultSelect()
+        if searchController.isActive {
+            navigationBarShadow(isHidden: false)
+        }
     }
 }
 
