@@ -1,5 +1,5 @@
 //
-//  AppDescriptionCell.swift
+//  DeveloperInfoCell.swift
 //  appstoreSearch
 //
 //  Created by Elon on 21/03/2019.
@@ -11,19 +11,19 @@ import RxSwift
 import RxCocoa
 
 
-class AppDescriptionCell: UITableViewCell {
+class DeveloperInfoCell: UITableViewCell {
 
     let disposeBag = DisposeBag()
-    static let identifier = "AppDescriptionCell"
+    static let identifier = "DeveloperInfoCell"
     
     override func awakeFromNib() {
         super.awakeFromNib()
-
+        // Initialization code
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
+        // Configure the view for the selected state
     }
-
 }

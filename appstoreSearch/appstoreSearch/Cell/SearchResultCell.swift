@@ -82,17 +82,26 @@ extension SearchResultCell {
         }
     }
     
+    func setDownloadButton(title: String?) {
+        var buttonTitle = title ?? "무료"
+        if buttonTitle == "무료" {
+            buttonTitle = "받기"
+        }
+        
+        downloadButton.setTitle(buttonTitle, for: .normal)
+        downloadButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
+    }
+    
     ///다운로드를 누르면 앱스토어 앱 상세페이지로 이동
-    func rx_downlaod() {
+    func tapDownload(with appStoreID: Int) {
         downloadButton
             .rx.tap
-            .throttle(0.5, scheduler: MainScheduler.instance)
-            .bind { [unowned self] in
-                guard let appStoreID = self.resultElement?.trackID else { return }
+            .asDriver()
+            .drive(onNext: {
                 let appStoreURLString = "itms-apps://tunes.apple.com/app/id\(appStoreID)"
                 guard let url = URL(string: appStoreURLString) else { return }
                 UIApplication.shared.open(url)
-            }
+            })
             .disposed(by: disposeBag)
     }
     
@@ -101,11 +110,11 @@ extension SearchResultCell {
         setAppIconImageView(by: model.artworkURL100)
         setTitleLabel(text: model.trackName)
         setSubTitleLabel(text: model.genres[safe: 0])
-        setStarRating(value: model.averageUserRating)
-        setRatingLabel(value: model.userRatingCount)
-        setScreenShotImageViews (by: model.screenshotURLs)
-        
-        rx_downlaod()
+        setStarRating(value: model.averageUserRatingForCurrentVersion)
+        setRatingLabel(value: model.userRatingCountForCurrentVersion)
+        setScreenShotImageViews(by: model.screenshotURLs)
+        setDownloadButton(title: model.formattedPrice)
+        tapDownload(with: model.trackID)
     }
 }
 

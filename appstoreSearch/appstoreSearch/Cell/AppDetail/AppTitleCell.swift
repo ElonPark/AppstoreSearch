@@ -12,20 +12,70 @@ import RxCocoa
 
 extension AppTitleCell {
     
-    func setUI(with data: ResultElement) {
+    func setAppIcon(by urlString: String) {
         appIconImageView
-            .rx_setImage(by: data.artworkURL512)
+            .rx_setImage(by: urlString)
             .disposed(by: disposeBag)
+    }
+    
+    func setTitleLabel(to text: String) {
+        titleLabel.text = text
+    }
+    
+    func setSubTitleLabel(to text: String) {
+        subTitleLabel.text = text
+    }
+    
+    func setDownloadButton(title: String?) {
+        var buttonTitle = title ?? "무료"
+        if buttonTitle == "무료" {
+            buttonTitle = "받기"
+        }
         
-        titleLabel.text = data.trackName
-        subTitleLabel.text = data.artistName
-        
+        downloadButton.setTitle(buttonTitle, for: .normal)
+        downloadButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
+    }
+    
+    func moveOutsideApp(to urlString: String) {
+        guard let url = URL(string: urlString) else { return }
+        UIApplication.shared.open(url)
+    }
+    
+    func tapDownload(with appStoreID: Int) {
+        downloadButton
+            .rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                let appStoreURL = "itms-apps://tunes.apple.com/app/id\(appStoreID)"
+                self?.moveOutsideApp(to: appStoreURL)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    
+    
+    func tapETCButton(with data: ResultElement) {
+        etcButton
+            .rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                self?.etcAction()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func setUI(with model: ResultElement) {
+        setAppIcon(by: model.artworkURL512)
+        setTitleLabel(to: model.trackName)
+        setSubTitleLabel(to: model.artistName)
+        setDownloadButton(title: model.formattedPrice)
+        tapDownload(with: model.trackID)
+        tapETCButton(with: model)
     }
 }
 
 
 class AppTitleCell: UITableViewCell {
-
     
     @IBOutlet weak var appIconImageView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
@@ -36,6 +86,8 @@ class AppTitleCell: UITableViewCell {
     let disposeBag = DisposeBag()
     static let identifier = "AppTitleCell"
     
+    var etcAction: (() -> Void) = {}
+
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

@@ -1,5 +1,5 @@
 //
-//  ScreenShotCell.swift
+//  AppInfoCell.swift
 //  appstoreSearch
 //
 //  Created by Elon on 21/03/2019.
@@ -10,10 +10,10 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-class ScreenShotCell: UITableViewCell {
+class AppInfoCell: UITableViewCell {
 
     let disposeBag = DisposeBag()
-    static let identifier = "ScreenShotCell"
+    static let identifier = "AppInfoCell"
     
     override func awakeFromNib() {
         super.awakeFromNib()

@@ -38,7 +38,8 @@ extension SearchViewController {
     func moveAppDetailVC(with model: ResultElement) {
         let appDetailVC = AppDetailViewController.instantiateVC()
         appDetailVC.searchResult = model
-        appDetailVC.dataSource.accept([model])
+        appDetailVC.cellFactory = AppDetailCellFactory(result: model)
+        
         navigationController?.pushViewController(appDetailVC,
                                                  animated: true)
     }
@@ -152,7 +153,7 @@ extension SearchViewController {
         searchController.searchBar
             .rx.text
             .orEmpty
-            .throttle(0.3, latest: true, scheduler: MainScheduler.instance)
+            .throttle(0.3, scheduler: MainScheduler.instance)
             .distinctUntilChanged()
             .filter { [unowned self] text in
                 self.searchController.isActive && self.isHangul(text)
@@ -211,11 +212,10 @@ class SearchViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-    
         navigationBarShadow(isHidden: true)
         setSearchHistoryTableView()
         setSearchController()
-        
+
         dataBinding()
         selectCellItem()
         
@@ -233,4 +233,3 @@ class SearchViewController: UIViewController {
         }
     }
 }
-

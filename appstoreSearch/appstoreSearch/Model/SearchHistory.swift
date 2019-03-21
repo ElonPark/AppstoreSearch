@@ -38,7 +38,7 @@ struct SearchHistory {
         while history.count > capacity {
             history.removeLast()
         }
-        print(history)
+        
         set(history)
     }
 }
