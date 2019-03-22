@@ -24,45 +24,30 @@ extension AppDetailViewController {
     
     func setNavigationBarIcon() {
         guard let urlString = searchResult?.artworkURL60 else { return }
-        
-        let rect = CGRect(x: 0, y: 0, width: 30, height: 30)
-        appIconImageView = UIImageView(frame: rect)
-        appIconImageView.contentMode = .scaleAspectFit
-        appIconImageView.clipsToBounds = true
-        appIconImageView.layer.cornerRadius = 8
-        appIconImageView.layer.borderColor =
-            UIColor(named: "LightSilver")?.cgColor
-        appIconImageView.layer.borderWidth = 0.5
         appIconImageView.rx_setImage(by: urlString)
             .disposed(by: disposeBag)
         appIconImageView.isHidden = true
-        appIconImageView.snp.makeConstraints { (make) in
-            make.width.height.equalTo(30)
-        }
         
         navigationItem.titleView = appIconImageView
     }
     
-    //FIXME: 작업중
     func setNavigationBarButton() {
-        //TODO: 네비게이션바 오른쪽에 다운로드 버튼 추가
         guard let result = searchResult else { return }
         var title = result.formattedPrice ?? "무료"
         title = title == "무료" ? "받기" : title
         
-        let rect = CGRect(x: 0, y: 0, width: 70, height: 30)
-        downloadButton = UIButton(frame: rect)
-        downloadButton.setTitle(title, for: .normal)
-        downloadButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
+        let attributes: [NSAttributedString.Key : Any] = [
+            .foregroundColor : UIColor.white.cgColor,
+            .font : UIFont.systemFont(ofSize: 14, weight: .semibold)
+        ]
         
-        downloadButton.layer.cornerRadius = 30 / 2
-        downloadButton.layer.borderColor =
-            UIColor(named: "LightSilver")?.cgColor
-        downloadButton.layer.borderWidth = 0.5
+        let attributedString = NSAttributedString(string: title,
+                                                  attributes: attributes)
         
-        let view = UIView(frame: rect)
-        downloadButton.addSubview(view)
-        barButtonItem = UIBarButtonItem(customView: view)
+        downloadButton.setAttributedTitle(attributedString, for: .normal)
+        downloadButton.isHidden = true
+        
+        let barButtonItem = UIBarButtonItem(customView: downloadButton)
         navigationItem.rightBarButtonItem = barButtonItem
     }
     
@@ -103,16 +88,21 @@ extension AppDetailViewController {
     
     
     func showShareSheet() {
-        let appStoreURL = "https://tunes.apple.com/app/id"
-        guard let appID = searchResult?.trackID,
-            let url = URL(string: appStoreURL + String(appID)) else {
+        guard let urlString = searchResult?.trackViewURL,
+            let url = URL(string: urlString) else {
                 return
         }
         
-        let items: [Any] = [url, url.absoluteString]
+        let items: [Any] = [url, urlString]
         let activityVC = UIActivityViewController(activityItems: items,
                                                   applicationActivities: nil)
         present(activityVC, animated: true)
+    }
+    
+    func moveAppstoreAppPage() {
+        guard let urlString = self.searchResult?.trackViewURL else { return }
+        guard let url = URL(string: urlString) else { return }
+        UIApplication.shared.open(url)
     }
     
     func moveAppStoreOtherApp() {
@@ -231,11 +221,22 @@ extension AppDetailViewController {
             .disposed(by: disposeBag)
     }
     
+    func tapDownloadButton() {
+        downloadButton
+            .rx.tap
+            .asDriver()
+            .drive(onNext: { [unowned self] in
+                self.moveAppstoreAppPage()
+            })
+            .disposed(by: disposeBag)
+    }
+    
     func showNaviItemIfNeed(with offset: CGPoint) {
         let index = IndexPath(row: 0, section: 0)
         let cell = detailTableView.cellForRow(at: index)
         if let height = cell?.frame.height {
             appIconImageView.isHidden = offset.y < height
+            downloadButton.isHidden = offset.y < height
         }
     }
     
@@ -261,11 +262,37 @@ class AppDetailViewController: UIViewController {
     
     var appMenu = [AppDetailProtocol]()
     
-    lazy var appIconImageView = UIImageView(image: nil)
-    lazy var downloadButton = UIButton(frame: CGRect.zero)
-    var barButtonItem: UIBarButtonItem?
+    lazy var appIconImageView: UIImageView  = {
+        let rect = CGRect(x: 0, y: 0, width: 30, height: 30)
+        let imageView = UIImageView(frame: rect)
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 8
+        imageView.layer.borderColor =
+            UIColor(named: "LightSilver")?.cgColor
+        imageView.layer.borderWidth = 0.5
+        imageView.snp.makeConstraints { (make) in
+            make.width.height.equalTo(30)
+        }
+        
+        return imageView
+    }()
     
-    ///FIXME: 임시 데이터
+    var downloadButton: UIButton = {
+        let rect = CGRect(x: 0, y: 0, width: 70, height: 30)
+        let button = UIButton(frame: rect)
+        button.backgroundColor = button.tintColor
+        
+        button.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
+        
+        button.layer.cornerRadius = 30 / 2
+        button.layer.borderColor =
+            UIColor(named: "LightSilver")?.cgColor
+        button.layer.borderWidth = 0.5
+        
+        return button
+    }()
+    
     lazy var dataSource = BehaviorRelay(value: appMenu)
     
     class func instantiateVC() -> AppDetailViewController {
@@ -278,37 +305,22 @@ class AppDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setNavigationBarIcon()
+        setNavigationBarButton()
         
         setDeatailTableView()
+        tableViewDidScroll()
         dataBinding()
         selectCellItem()
+        tapDownloadButton()
         
         setAppMenu()
         dataSource.accept(appMenu)
-        
-        //FIXME: 작업중
-        setNavigationBarIcon()
-        //setNavigationBarButton()
-        tableViewDidScroll()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setRrefersLargeTitles()
         navigationBarShadow(isHidden: true)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        //FIXME: 작업중
-        //navigationItem.titleView?.isHidden = true
-        //downloadButton.isHidden = true
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        //FIXME: 작업중
-        //appIconImageView.removeFromSuperview()
-        //navigationItem.rightBarButtonItem = nil
     }
 }
