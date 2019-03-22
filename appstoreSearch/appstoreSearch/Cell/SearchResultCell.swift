@@ -93,13 +93,12 @@ extension SearchResultCell {
     }
     
     ///다운로드를 누르면 앱스토어 앱 상세페이지로 이동
-    func tapDownload(with appStoreID: Int) {
+    func tapDownload(with url: String) {
         downloadButton
             .rx.tap
             .asDriver()
             .drive(onNext: {
-                let appStoreURLString = "itms-apps://tunes.apple.com/app/id\(appStoreID)"
-                guard let url = URL(string: appStoreURLString) else { return }
+                guard let url = URL(string: url) else { return }
                 UIApplication.shared.open(url)
             })
             .disposed(by: disposeBag)
@@ -114,7 +113,8 @@ extension SearchResultCell {
         setRatingLabel(value: model.userRatingCountForCurrentVersion)
         setScreenShotImageViews(by: model.screenshotURLs)
         setDownloadButton(title: model.formattedPrice)
-        tapDownload(with: model.trackID)
+        tapDownload(with: model.trackViewURL)
+        
     }
 }
 
@@ -147,9 +147,5 @@ class SearchResultCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         initCell()
-    }
-    
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
     }
 }

@@ -30,8 +30,8 @@ extension ScreenShotCell {
     
     }
     
-    func setScreenShot(with model: ResultElement) {
-        dataSource.accept(model.screenshotURLs)
+    func setScreenShot(with model: ScreenShots) {
+        dataSource.accept(model.urlStrings)
     }
 }
 
@@ -51,9 +51,5 @@ class ScreenShotCell: UITableViewCell {
         imageCollectionView.delegate = nil
         dataBinding()
         
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
     }
 }

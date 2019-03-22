@@ -7,23 +7,39 @@
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
 
+
+extension DeveloperInfoCell {
+    
+    func initUI() {
+        titleLabel.text = ""
+        subTitleLabel.text = ""
+        showMoreImageView.image = UIImage(named: "rightArrow")
+    }
+    
+    func setTitle(text: String) {
+        titleLabel.text = text
+    }
+    func setSubTitle(text: String) {
+        subTitleLabel.text = text
+    }
+ 
+    func setUI(with model: Info) {
+        setTitle(text: model.title)
+        setSubTitle(text: model.subTitle)
+    }
+}
 
 class DeveloperInfoCell: UITableViewCell {
 
-    let disposeBag = DisposeBag()
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var subTitleLabel: UILabel!
+    @IBOutlet weak var showMoreImageView: UIImageView!
+    
     static let identifier = "DeveloperInfoCell"
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
+        initUI()
     }
 }

@@ -1,5 +1,5 @@
 //
-//  AppDetail.swift
+//  AppDetailProtocol.swift
 //  appstoreSearch
 //
 //  Created by Elon on 21/03/2019.
@@ -28,4 +28,8 @@ struct AppDetail {
         self.type = type
         self.needExtened = needExtened
     }
+}
+
+protocol AppDetailProtocol {
+    var type: DetailCellType { get set }
 }

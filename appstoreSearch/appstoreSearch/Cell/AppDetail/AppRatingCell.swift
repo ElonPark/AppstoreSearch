@@ -16,6 +16,7 @@ extension AppRatingCell {
     
     func initUI() {
         ratingScoreLabel.text = ""
+        ratingScoreLabelCostraintWidth.constant = 0
         starRatingView.rating = 0
         starRatingView.settings.starSize = 30
         starRatingView.settings.updateOnTouch = false
@@ -27,9 +28,15 @@ extension AppRatingCell {
         ageTitleLabel.text = "연령"
     }
     
-    func setRating(by userRating: Double?) {
+    func setRatingLabel(by userRating: Double?) {
         guard let rating = userRating else { return }
+        ratingScoreLabelCostraintWidth.constant = 30
         ratingScoreLabel.text = String(rating)
+    }
+    
+    func setStarRating(by userRating: Double?) {
+        guard let rating = userRating else { return }
+        
         starRatingView.rating = rating
         starRatingView.settings.starSize = 20
     }
@@ -68,18 +75,20 @@ extension AppRatingCell {
         ageLabel.text = age
     }
     
-    func setUI(with model: ResultElement) {
-        setRating(by: model.averageUserRatingForCurrentVersion)
-        setRatingCount(by: model.userRatingCountForCurrentVersion)
+    func setUI(with model: Rating) {
+        setRatingLabel(by: model.userRating)
+        setStarRating(by: model.userRating)
+        setRatingCount(by: model.userRatingCount)
         setRank()
-        setCategory(by: model.genres[safe: 0])
-        setAge(by: model.trackContentRating)
+        setCategory(by: model.category[0])
+        setAge(by: model.contentRating)
     }
 }
 
 class AppRatingCell: UITableViewCell {
 
     @IBOutlet weak var ratingScoreLabel: UILabel!
+    @IBOutlet weak var ratingScoreLabelCostraintWidth: NSLayoutConstraint!
     @IBOutlet weak var starRatingView: CosmosView!
     @IBOutlet weak var ratingCountLabel: UILabel!
     
@@ -97,11 +106,4 @@ class AppRatingCell: UITableViewCell {
         super.awakeFromNib()
         initUI()
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-
 }

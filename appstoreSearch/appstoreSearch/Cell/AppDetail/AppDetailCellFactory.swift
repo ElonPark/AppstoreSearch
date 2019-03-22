@@ -17,43 +17,94 @@ class AppDetailCellFactory {
         searchResult = result
     }
     
-    func appTitleCell(by table: UITableView, etcAction: @escaping (() -> Void)) -> AppTitleCell {
+    func appTitleCell(by table: UITableView, data: AppDetailProtocol, etcAction: @escaping (() -> Void)) -> AppTitleCell {
         let cell =  table.dequeueReusableCell(withIdentifier: AppTitleCell.identifier) as! AppTitleCell
+        
         cell.etcAction = etcAction
-        cell.setUI(with: searchResult)
+        if let titleData = data as? TitleData {
+            cell.setUI(with: titleData)
+        }
         
         return cell
     }
     
-    func appRatingCell(by table: UITableView) -> AppRatingCell {
+    func appRatingCell(by table: UITableView, data: AppDetailProtocol) -> AppRatingCell {
         let cell =  table.dequeueReusableCell(withIdentifier: AppRatingCell.identifier) as! AppRatingCell
-        
-        cell.setUI(with: searchResult)
+        if let rating = data as? Rating {
+            cell.setUI(with: rating)
+        }
         
         return cell
     }
     
-    func newFeatureCell(by table: UITableView, needExtened: Bool, readMore: @escaping (Bool) -> Void) -> NewFeatureCell {
+    func newFeatureCell(by table: UITableView, data: AppDetailProtocol, readMore: @escaping (Bool) -> Void) -> NewFeatureCell {
         let cell =  table.dequeueReusableCell(withIdentifier: NewFeatureCell.identifier) as! NewFeatureCell
         
         cell.readMore = readMore
-        cell.setUI(with: searchResult, needExtened: needExtened)
+        if let releaseNote = data as? ReleaseNote {
+            cell.setUI(with: releaseNote)
+        }
         
         return cell
     }
     
-    func screenShotCell(by table: UITableView) -> ScreenShotCell {
+    func screenShotCell(by table: UITableView, data: AppDetailProtocol) -> ScreenShotCell {
         let cell = table.dequeueReusableCell(withIdentifier: ScreenShotCell.identifier) as! ScreenShotCell
         
-        cell.setScreenShot(with: searchResult)
+        if let screenShot = data as? ScreenShots {
+            cell.setScreenShot(with: screenShot)
+        }
         
         return cell
     }
     
-    func infoTitleCell(by table: UITableView) -> AppInfoTitleCell {
+    func screenShotDeivceCell(by table: UITableView, data: AppDetailProtocol, readMore: @escaping (Bool) -> Void) -> ScreenShotDeivceCell {
+        let cell = table.dequeueReusableCell(withIdentifier: ScreenShotDeivceCell.identifier) as! ScreenShotDeivceCell
+        
+        if let deviceInfo = data as? DeviceInfo {
+            cell.setUI(with: deviceInfo)
+        }
+        
+        return cell
+    }
+    
+    func infoTitleCell(by table: UITableView, data: AppDetailProtocol) -> AppInfoTitleCell {
         let cell = table.dequeueReusableCell(withIdentifier: AppInfoTitleCell.identifier) as! AppInfoTitleCell
-        //FIXME: 프로토로콜에서 제어하도록 수정
-        cell.setTitle(text: "미리보기")
+        
+        if let preview = data as? InfoTitle {
+            cell.setTitle(text: preview.title)
+        }
+        
+        return cell
+    }
+    
+    func appDescriptionCell(by table: UITableView, data: AppDetailProtocol, readMore: @escaping (Bool) -> Void) -> AppDescriptionCell {
+        let cell = table.dequeueReusableCell(withIdentifier: AppDescriptionCell.identifier) as! AppDescriptionCell
+        
+        cell.readMore = readMore
+        if let description = data as? Description {
+            cell.setUI(with: description)
+        }
+        
+        return cell
+    }
+    
+    func developerInfoCell(by table: UITableView, data: AppDetailProtocol) -> DeveloperInfoCell {
+        let cell = table.dequeueReusableCell(withIdentifier: DeveloperInfoCell.identifier) as! DeveloperInfoCell
+        
+        if let developerInfo = data as? Info {
+            cell.setUI(with: developerInfo)
+        }
+        
+        return cell
+    }
+    
+    func infoCell(by table: UITableView, data: AppDetailProtocol) -> AppInfoCell {
+        let cell = table.dequeueReusableCell(withIdentifier: AppInfoCell.identifier) as! AppInfoCell
+        
+        if let info = data as? Info {
+            cell.setUI(with: info)
+        }
         
         return cell
     }

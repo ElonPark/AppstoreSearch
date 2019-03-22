@@ -194,7 +194,6 @@ extension SearchViewController {
 }
 
 
-//TODO: 검색 결과 화면은 스크린샷과 동일하게 구현
 //TODO: 상세 화면은 제공되는 API내에서 최대한 구현
 
 class SearchViewController: UIViewController {
@@ -227,9 +226,6 @@ class SearchViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setRrefersLargeTitles()
-        
-        if searchController.isActive {
-            navigationBarShadow(isHidden: false)
-        }
+        navigationBarShadow(isHidden: !searchController.isActive)
     }
 }

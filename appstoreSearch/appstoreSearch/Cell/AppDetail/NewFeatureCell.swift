@@ -29,42 +29,18 @@ extension NewFeatureCell {
         //TODO: 한글 날짜 추가
     }
     
-    func setReleaseNoteText(by releaseNote: String) {
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 1.5
-        
-        let attributes: [NSAttributedString.Key : Any] = [
-            .paragraphStyle : paragraphStyle,
-            .font : UIFont.systemFont(ofSize: 14, weight: .regular)
-        ]
-        
-        let attributedString = NSAttributedString(string: releaseNote,
-                                                  attributes: attributes)
-        if needExtened {
-            let width = releaseNoteLabel.frame.width
-            let size = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
-            
-            let rect = attributedString.boundingRect(with: size,
-                                                     options: .usesLineFragmentOrigin,
-                                                     context: nil)
-            
-            releaseNoteLabel.bounds = rect
-        }
-        
-        releaseNoteLabel.attributedText = attributedString
-    }
-    
     func setReleaseNote(by releaseNote: String) {
         let count = releaseNote.components(separatedBy: "\n").count
     
         if needExtened {
             readMoreButton.isHidden = true
-            releaseNoteLabel.numberOfLines = count * 2
         } else if count > 3 {
             readMoreButton.isHidden = false
         }
-
-        setReleaseNoteText(by: releaseNote)
+        
+        releaseNoteLabel.extendable(text: releaseNote,
+                                    extened: needExtened,
+                                    lineHeightMultiple: true)
     }
     
     func tapVersionHistory() {
@@ -88,12 +64,11 @@ extension NewFeatureCell {
             .disposed(by: disposeBag)
     }
     
-    func setUI(with model: ResultElement, needExtened: Bool) {
-        releaseNote = model.releaseNotes ?? ""
-        self.needExtened = needExtened
+    func setUI(with model: ReleaseNote) {
+        self.needExtened = model.needExtened
         setVersion(by: model.version)
-        setUpdateLabel(releaseDate: model.currentVersionReleaseDate)
-        setReleaseNote(by: model.releaseNotes ?? "")
+        setUpdateLabel(releaseDate: model.updateDate)
+        setReleaseNote(by: model.text)
         tapVersionHistory()
         tapReadMore()
     }
@@ -115,17 +90,9 @@ class NewFeatureCell: UITableViewCell {
     static let identifier = "NewFeatureCell"
     var needExtened: Bool = false
     var readMore: (Bool) -> Void = {_ in }
-    var releaseNote: String = ""
     
     override func awakeFromNib() {
         super.awakeFromNib()
         initUI()
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-
 }

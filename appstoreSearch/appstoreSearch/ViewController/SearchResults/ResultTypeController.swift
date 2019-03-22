@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SnapKit
 
 enum ResultType {
     case related
@@ -19,7 +20,13 @@ class ResultTypeController: UIViewController {
     func add(to parent: UIViewController) {
         parent.addChild(self)
         parent.view.addSubview(self.view)
-        self.view.autoresizingMask = [ .flexibleWidth, .flexibleWidth ]
+        self.view.snp.makeConstraints { (make) in
+            make.top.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+        }
+
         self.didMove(toParent: parent)
     }
     

@@ -41,20 +41,18 @@ extension AppTitleCell {
         UIApplication.shared.open(url)
     }
     
-    func tapDownload(with appStoreID: Int) {
+    func tapDownload(with url: String) {
         downloadButton
             .rx.tap
             .asDriver()
             .drive(onNext: { [weak self] in
-                let appStoreURL = "itms-apps://tunes.apple.com/app/id\(appStoreID)"
-                self?.moveOutsideApp(to: appStoreURL)
+                self?.moveOutsideApp(to: url)
             })
             .disposed(by: disposeBag)
     }
     
     
-    
-    func tapETCButton(with data: ResultElement) {
+    func tapETCButton() {
         etcButton
             .rx.tap
             .asDriver()
@@ -64,13 +62,13 @@ extension AppTitleCell {
             .disposed(by: disposeBag)
     }
     
-    func setUI(with model: ResultElement) {
-        setAppIcon(by: model.artworkURL512)
-        setTitleLabel(to: model.trackName)
-        setSubTitleLabel(to: model.artistName)
-        setDownloadButton(title: model.formattedPrice)
-        tapDownload(with: model.trackID)
-        tapETCButton(with: model)
+    func setUI(with model: TitleData) {
+        setAppIcon(by: model.iconURLString)
+        setTitleLabel(to: model.title)
+        setSubTitleLabel(to: model.subTitle)
+        setDownloadButton(title: model.price)
+        tapDownload(with: model.appStoreURL)
+        tapETCButton()
     }
 }
 
@@ -90,13 +88,5 @@ class AppTitleCell: UITableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-
 }
