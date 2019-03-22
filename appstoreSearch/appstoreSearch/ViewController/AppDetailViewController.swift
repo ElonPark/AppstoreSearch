@@ -22,29 +22,25 @@ extension AppDetailViewController {
         navigationController?.navigationBar.setValue(isHidden, forKey: "hidesShadow")
     }
     
-    //FIXME: 작업중
     func setNavigationBarIcon() {
-        //TODO: 네비게이션바 가운데 앱아이콘 추가
         guard let urlString = searchResult?.artworkURL60 else { return }
-        Log.verbose(urlString)
         
         let rect = CGRect(x: 0, y: 0, width: 30, height: 30)
         appIconImageView = UIImageView(frame: rect)
         appIconImageView.contentMode = .scaleAspectFit
         appIconImageView.clipsToBounds = true
-        appIconImageView.layer.cornerRadius = 5
+        appIconImageView.layer.cornerRadius = 8
         appIconImageView.layer.borderColor =
             UIColor(named: "LightSilver")?.cgColor
         appIconImageView.layer.borderWidth = 0.5
         appIconImageView.rx_setImage(by: urlString)
             .disposed(by: disposeBag)
         appIconImageView.isHidden = true
-        appIconImageView.backgroundColor = UIColor.black
         appIconImageView.snp.makeConstraints { (make) in
             make.width.height.equalTo(30)
         }
         
-        navigationController?.navigationItem.titleView = appIconImageView
+        navigationItem.titleView = appIconImageView
     }
     
     //FIXME: 작업중
@@ -66,8 +62,8 @@ extension AppDetailViewController {
         
         let view = UIView(frame: rect)
         downloadButton.addSubview(view)
-        let button = UIBarButtonItem(customView: view)
-        navigationController?.navigationItem.rightBarButtonItem = button
+        barButtonItem = UIBarButtonItem(customView: view)
+        navigationItem.rightBarButtonItem = barButtonItem
     }
     
     func setDeatailTableView() {
@@ -239,7 +235,6 @@ extension AppDetailViewController {
         let index = IndexPath(row: 0, section: 0)
         let cell = detailTableView.cellForRow(at: index)
         if let height = cell?.frame.height {
-            Log.verbose("cell height: \(height), offset.y: \(offset.y)")
             appIconImageView.isHidden = offset.y < height
         }
     }
@@ -268,6 +263,7 @@ class AppDetailViewController: UIViewController {
     
     lazy var appIconImageView = UIImageView(image: nil)
     lazy var downloadButton = UIButton(frame: CGRect.zero)
+    var barButtonItem: UIBarButtonItem?
     
     ///FIXME: 임시 데이터
     lazy var dataSource = BehaviorRelay(value: appMenu)
@@ -292,7 +288,7 @@ class AppDetailViewController: UIViewController {
         
         //FIXME: 작업중
         setNavigationBarIcon()
-        setNavigationBarButton()
+        //setNavigationBarButton()
         tableViewDidScroll()
     }
     
@@ -300,5 +296,19 @@ class AppDetailViewController: UIViewController {
         super.viewWillAppear(animated)
         setRrefersLargeTitles()
         navigationBarShadow(isHidden: true)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        //FIXME: 작업중
+        //navigationItem.titleView?.isHidden = true
+        //downloadButton.isHidden = true
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        //FIXME: 작업중
+        //appIconImageView.removeFromSuperview()
+        //navigationItem.rightBarButtonItem = nil
     }
 }
