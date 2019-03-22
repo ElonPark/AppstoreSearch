@@ -34,8 +34,10 @@ struct Result: Codable {
     
 
 struct ResultElement: Codable {
-    let screenshotUrls: [String]
-    let artistViewURL: String
+    let screenshotURLs: [String]
+    let ipadScreenshotURLs: [String]
+    let appletvScreenshotURLs: [String]
+    let artistViewURL: String?
     let artworkURL60: String
     let artworkURL100: String
     let artworkURL512: String
@@ -59,7 +61,7 @@ struct ResultElement: Codable {
     let sellerName: String
     let isVppDeviceBasedLicensingEnabled: Bool
     let minimumOSVersion: String
-    let formattedPrice: String
+    let formattedPrice: String?
     let genreIDs: [String]
     let currency: String
     let wrapperType: String
@@ -67,7 +69,7 @@ struct ResultElement: Codable {
     let trackID, artistID: Int
     let artistName: String
     let genres: [String]
-    let price: Int
+    let price: Double?
     let description: String
     let bundleID: String
     let trackName: String
@@ -77,7 +79,9 @@ struct ResultElement: Codable {
     let sellerURL: String?
     
     enum CodingKeys: String, CodingKey {
-        case screenshotUrls
+        case screenshotURLs = "screenshotUrls"
+        case ipadScreenshotURLs = "ipadScreenshotUrls"
+        case appletvScreenshotURLs = "appletvScreenshotUrls"
         case artistViewURL = "artistViewUrl"
         case artworkURL60 = "artworkUrl60"
         case artworkURL100 = "artworkUrl100"

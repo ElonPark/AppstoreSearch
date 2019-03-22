@@ -22,17 +22,17 @@ class API {
     
     private init() {}
     
-    private func requsetURL(_ urlString: String, with parameters: [String : String] = [String : String]()) -> URL? {
+    private func requsetURL(_ urlString: String, with parameters: [String : String]? = nil) -> URL? {
         var urlComponents = URLComponents(string: urlString)
-        urlComponents?.path = endpoint
         
-        var query = [URLQueryItem]()
-        for parameter in parameters {
-            let item = URLQueryItem(name: parameter.key, value: parameter.value)
-            query.append(item)
+        if let _parameters = parameters {
+           let query = _parameters.map {
+                URLQueryItem(name: $0.key, value: $0.value)
+            }
+
+            urlComponents?.queryItems = query
         }
         
-        urlComponents?.queryItems = query
         
         return urlComponents?.url
     }
@@ -42,12 +42,12 @@ class API {
             "term" : keyword,
             "media" : "software",
             "entity" : "software",
-            "limit" : "200",
+            "limit" : "10",
             "lang" : "ko_kr",
             "country" : "kr"
         ]
         
-        let url = requsetURL(hostURL, with: parameter)
+        let url = requsetURL(hostURL + endpoint, with: parameter)
         
         //네트워크 관련 라이브러리 사용 제한
         //URLSession.shared.rx.json(url: url)
@@ -90,7 +90,7 @@ class API {
             let task = self.request(with: url, method: .get) { responseData, requsetError in
                 if let error = requsetError {
                     observer.onError(error)
-                    
+
                 } else if let data = responseData {
                     observer.onNext(data)
                     observer.onCompleted()
@@ -105,7 +105,7 @@ class API {
     
     
     private func request(with url: URL, method: HTTP, completion: @escaping (Data?, Error?) -> Void) -> URLSessionDataTask {
-        var request = URLRequest(url: url, timeoutInterval: 15)
+        var request = URLRequest(url: url, timeoutInterval: 30)
         request.httpMethod = method.rawValue
         
         URLSession.shared.configuration.waitsForConnectivity = true
@@ -114,7 +114,7 @@ class API {
             defer {
                 completion(responseData, error)
             }
-            
+    
             guard requsetError == nil else {
                 error = requsetError
                 return
