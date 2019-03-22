@@ -46,12 +46,14 @@ extension RelatedKeywordsViewController {
     func selectCellItem() {
         relatedResultTableView
             .rx.itemSelected
-            .throttle(0.3, scheduler: MainScheduler.instance)
-            .distinctUntilChanged()
-            .bind { [unowned self] indexPath in
+            .asDriver()
+            .drive(onNext: { [unowned self] indexPath in
                 let text = self.dataSource.value[indexPath.row]
                 self.selectItem(text)
-            }
+                
+                let cell = self.relatedResultTableView.cellForRow(at: indexPath) as? RelatedResultCell
+                cell?.setSelected(false, animated: true)
+            })
             .disposed(by: disposeBag)
     }
 }

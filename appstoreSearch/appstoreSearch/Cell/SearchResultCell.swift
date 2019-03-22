@@ -22,28 +22,13 @@ extension SearchResultCell {
         
         for screenShotView in screenShotImageViews {
             screenShotView.image = nil
-            screenShotView.isHidden = true
         }
     }
     
-    private func loadImage(to imageView: UIImageView, by urlString: String) {
-        API.shared.requestImage(urlString: urlString)
-            .observeOn(ConcurrentDispatchQueueScheduler(qos: .background))
-            .retry(2)
-            .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { imageData in
-                let image = UIImage(data: imageData)
-                imageView.image = image
-                imageView.isHidden = false
-            }, onError: { error in
-                Log.error(error.localizedDescription, error)
-                imageView.isHidden = true
-            })
-            .disposed(by: disposeBag)
-    }
-    
     func setAppIconImageView(by urlString: String) {
-        loadImage(to: appIconImageView, by: urlString)
+        appIconImageView
+            .rx_setImage(by: urlString)
+            .disposed(by: disposeBag)
     }
     
     func setTitleLabel(text: String) {
@@ -82,28 +67,40 @@ extension SearchResultCell {
         ratingLabel.text = ratingText
     }
     
+    ///TODO: 이미지 로딩 개선
+    ///FIXME: 이미지 크기에 따라 스택뷰 조절
     func setScreenShotImageViews(by urlStrings: [String]) {
         for index in 0..<screenShotImageViews.count {
             let imageView = screenShotImageViews[index]
             if let urlString = urlStrings[safe: index] {
-                loadImage(to: screenShotImageViews[index], by: urlString)
+                imageView
+                    .rx_setImage(by: urlString)
+                    .disposed(by: disposeBag)
             } else {
                 imageView.isHidden = true
             }
         }
     }
     
+    func setDownloadButton(title: String?) {
+        var buttonTitle = title ?? "무료"
+        if buttonTitle == "무료" {
+            buttonTitle = "받기"
+        }
+        
+        downloadButton.setTitle(buttonTitle, for: .normal)
+        downloadButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
+    }
+    
     ///다운로드를 누르면 앱스토어 앱 상세페이지로 이동
-    func rx_downlaod() {
+    func tapDownload(with url: String) {
         downloadButton
             .rx.tap
-            .throttle(0.5, scheduler: MainScheduler.instance)
-            .bind { [unowned self] in
-                guard let appStoreID = self.resultElement?.trackID else { return }
-                let appStoreURLString = "itms-apps://tunes.apple.com/app/id\(appStoreID)"
-                guard let url = URL(string: appStoreURLString) else { return }
+            .asDriver()
+            .drive(onNext: {
+                guard let url = URL(string: url) else { return }
                 UIApplication.shared.open(url)
-            }
+            })
             .disposed(by: disposeBag)
     }
     
@@ -112,11 +109,12 @@ extension SearchResultCell {
         setAppIconImageView(by: model.artworkURL100)
         setTitleLabel(text: model.trackName)
         setSubTitleLabel(text: model.genres[safe: 0])
-        setStarRating(value: model.averageUserRating)
-        setRatingLabel(value: model.userRatingCount)
-        setScreenShotImageViews (by: model.screenshotURLs)
+        setStarRating(value: model.averageUserRatingForCurrentVersion)
+        setRatingLabel(value: model.userRatingCountForCurrentVersion)
+        setScreenShotImageViews(by: model.screenshotURLs)
+        setDownloadButton(title: model.formattedPrice)
+        tapDownload(with: model.trackViewURL)
         
-        rx_downlaod()
     }
 }
 
@@ -149,9 +147,5 @@ class SearchResultCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         initCell()
-    }
-    
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
     }
 }

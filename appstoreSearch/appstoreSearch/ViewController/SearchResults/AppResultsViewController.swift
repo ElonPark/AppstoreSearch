@@ -40,38 +40,39 @@ extension AppResultsViewController {
         dataSource.accept(result.results)
     }
     
-    func showResultEmptyViewIfNeeded() {
-        let resultCount = searchResult?.resultCount ?? 0
-        searchResultTableView.isHidden = resultCount < 1
-        resultEmptyView.isHidden = resultCount > 0
+    func showResultEmptyView() {
+        searchResult = nil
+        searchResultTableView.isHidden = true
+    }
+    
+    func checkResultCount() {
+        guard let result = searchResult else { return }
+        searchResultTableView.isHidden = result.resultCount < 1
     }
     
     func search(by keyword: String) {
         API.shared.searchAppsotre(by: keyword.removeJamo())
-            .observeOn(ConcurrentDispatchQueueScheduler(qos: .background))
             .retry(2)
+            .observeOn(ConcurrentDispatchQueueScheduler(qos: .default))
             .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] result in
-                Log.verbose("성공")
                 self?.updateDataSource(by: result)
-            }, onError: { [weak self] error in
-                Log.error(error.localizedDescription, error)
-                self?.showResultEmptyViewIfNeeded()
+                }, onError: { [weak self] error in
+                    Log.error(error.localizedDescription, error)
+                    self?.showResultEmptyView()
                 }, onCompleted: { [weak self] in
-                    Log.verbose("onCompleted")
-                    self?.showResultEmptyViewIfNeeded()
+                    self?.checkResultCount()
             })
             .disposed(by: disposeBag)
     }
     
     func searchText() {
         rx_searchText
+            .debounce(0.3, scheduler: MainScheduler.instance)
             .distinctUntilChanged()
-            .observeOn(MainScheduler.instance)
             .bind { [unowned self] text in
                 self.setResultEmptyView(with: text)
-                self.searchResult = nil
-                self.dataSource.accept([ResultElement]())
+                self.dataSource.accept([])
                 self.search(by: text)
             }
             .disposed(by: disposeBag)
@@ -91,12 +92,13 @@ extension AppResultsViewController {
     func selectCellItem() {
         searchResultTableView
             .rx.itemSelected
-            .throttle(0.3, scheduler: MainScheduler.instance)
-            .distinctUntilChanged()
-            .bind { [unowned self] indexPath in
+            .asDriver()
+            .drive(onNext: { [unowned self] indexPath in
                 let result = self.dataSource.value[indexPath.row]
                 self.selectItem(result)
-            }
+                let cell = self.searchResultTableView.cellForRow(at: indexPath) as? SearchResultCell
+                cell?.setSelected(false, animated: true)
+            })
             .disposed(by: disposeBag)
     }
 }
@@ -109,8 +111,9 @@ class AppResultsViewController: ResultTypeController {
     
     @IBOutlet weak var searchResultTableView: UITableView!
     
-    var searchResult: Result?
     let disposeBag = DisposeBag()
+    
+    var searchResult: Result?
     let rx_searchText = BehaviorRelay(value: String())
     let dataSource = BehaviorRelay(value: [ResultElement]())
     
