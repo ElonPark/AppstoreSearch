@@ -18,6 +18,7 @@ enum DetailCellType: String {
     case developerInfo = "DeveloperInfoCell"
     case infoTitle = "AppInfoTitleCell"
     case info = "AppInfoCell"
+    case developerSite = "developerSite"
 }
 
 struct AppDetail {

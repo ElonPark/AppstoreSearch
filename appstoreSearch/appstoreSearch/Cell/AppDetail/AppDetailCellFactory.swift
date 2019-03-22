@@ -109,4 +109,14 @@ class AppDetailCellFactory {
         return cell
     }
     
+    func developerSite(by table: UITableView, data: AppDetailProtocol) -> AppInfoCell {
+        let cell = table.dequeueReusableCell(withIdentifier: AppInfoCell.identifier) as! AppInfoCell
+        
+        if let info = data as? Info {
+            cell.setUI(with: info)
+        }
+        
+        return cell
+    }
+    
 }

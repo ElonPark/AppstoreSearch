@@ -75,7 +75,8 @@ extension AppDetailViewController {
             factory.category(),
             factory.compatibility(),
             factory.language(),
-            factory.age()
+            factory.age(),
+            factory.developerSite()
         ]
         
         //TODO: 업데이트 날짜가 3개월 이하일때 rating cell 아래에 미리보기 타이틀과 함께 적용
@@ -99,19 +100,28 @@ extension AppDetailViewController {
         present(activityVC, animated: true)
     }
     
-    func moveAppstoreAppPage() {
-        guard let urlString = self.searchResult?.trackViewURL else { return }
+    func moveOutside(to urlString: String) {
         guard let url = URL(string: urlString) else { return }
         UIApplication.shared.open(url)
+    }
+    
+    func moveAppstoreAppPage() {
+        guard let urlString = self.searchResult?.trackViewURL else { return }
+        moveOutside(to: urlString)
     }
     
     func moveAppStoreOtherApp() {
         guard let artistID = searchResult?.artistID else { return }
         let appStoreURLString = "itms-apps://itunes.apple.com/developer/id\(artistID)"
-        guard let url = URL(string: appStoreURLString) else { return }
-        UIApplication.shared.open(url)
+        moveOutside(to: appStoreURLString)
     }
  
+    func moveDeveloperSite() {
+        guard let urlString = searchResult?.sellerURL else { return }
+        
+        moveOutside(to: urlString)
+    }
+    
     func etcAction() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
@@ -143,24 +153,25 @@ extension AppDetailViewController {
         
         switch model.type {
         case .feature:
-            if let releaseNote = model as? ReleaseNote {
-                releaseNote.needExtened = needExtened
-                appMenu[index] = releaseNote
-                dataSource.accept(appMenu)
-            }
+            guard let releaseNote = model as? ReleaseNote  else { return }
+            guard !releaseNote.needExtened else { return }
+            releaseNote.needExtened = needExtened
+            appMenu[index] = releaseNote
+            dataSource.accept(appMenu)
+            
         case .description:
-            if let description = model as? Description {
-                description.needExtened = needExtened
-                appMenu[index] = description
-                dataSource.accept(appMenu)
-            }
+            guard let description = model as? Description else { return }
+            guard !description.needExtened else { return }
+            description.needExtened = needExtened
+            appMenu[index] = description
+            dataSource.accept(appMenu)
             
         case .info:
-            if let info = model as? Info {
-                info.needExtened = needExtened
-                appMenu[index] = info
-                dataSource.accept(appMenu)
-            }
+            guard let info = model as? Info else { return }
+            guard !info.needExtened else { return }
+            info.needExtened = needExtened
+            appMenu[index] = info
+            dataSource.accept(appMenu)
         default:
             break
         }
@@ -194,6 +205,9 @@ extension AppDetailViewController {
             return factory.infoTitleCell(by: table, data: model)
         case .info:
             return factory.infoCell(by: table, data: model)
+            
+        case .developerSite:
+            return factory.developerSite(by: table, data: model)
         }
     }
     
@@ -207,16 +221,23 @@ extension AppDetailViewController {
         .disposed(by: disposeBag)
     }
     
+    func selectItem(by indexPath: IndexPath) {
+        switch appMenu[indexPath.row].type {
+        case .developerInfo:
+            moveAppStoreOtherApp()
+        case .developerSite:
+            moveDeveloperSite()
+        default:
+            readMore(with: indexPath.row, needExtened: true)
+        }
+    }
+    
     func selectCellItem() {
         detailTableView
             .rx.itemSelected
             .asDriver()
             .drive(onNext: { [unowned self] indexPath in
-                if self.appMenu[indexPath.row].type == .developerInfo {
-                    self.moveAppStoreOtherApp()
-                } else {
-                    self.readMore(with: indexPath.row, needExtened: true)
-                }
+                self.selectItem(by: indexPath)
             })
             .disposed(by: disposeBag)
     }
@@ -271,14 +292,10 @@ class AppDetailViewController: UIViewController {
         imageView.layer.borderColor =
             UIColor(named: "LightSilver")?.cgColor
         imageView.layer.borderWidth = 0.5
-        imageView.snp.makeConstraints { (make) in
-            make.width.height.equalTo(30)
-        }
-        
         return imageView
     }()
     
-    var downloadButton: UIButton = {
+   lazy var downloadButton: UIButton = {
         let rect = CGRect(x: 0, y: 0, width: 70, height: 30)
         let button = UIButton(frame: rect)
         button.backgroundColor = button.tintColor

@@ -164,4 +164,12 @@ struct AppDetailFactory {
                     subTitle: result.trackContentRating,
                     description: "")
     }
+    
+    func developerSite() -> Info {
+        return Info(type: .developerSite,
+                    title: "개발자 웹사이트",
+                    subTitle: "",
+                    description: "")
+        
+    }
 }
