@@ -1,5 +1,23 @@
 # [채널모바일개발] iOS 모바일 앱 개발자 코딩테스트
 
+---  
+> **개발환경**  
+> `macOS 10.14.3`  
+> `Xcode 10.1`  
+> `Swift 4.2`
+
+
+
+- 실행 시 주의 사항
+
+```shell
+#다운로드한 폴더로 이동 후 
+cd ./AppstoreSearch/appstoreSearch
+pod repo update
+pod install
+
+```
+
 
 ## 과제 설명
 
