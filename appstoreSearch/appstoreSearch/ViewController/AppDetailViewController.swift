@@ -26,7 +26,6 @@ extension AppDetailViewController {
         guard let urlString = searchResult?.artworkURL60 else { return }
         appIconImageView.rx_setImage(by: urlString)
             .disposed(by: disposeBag)
-        appIconImageView.isHidden = true
         
         navigationItem.titleView = appIconImageView
     }
@@ -36,16 +35,11 @@ extension AppDetailViewController {
         var title = result.formattedPrice ?? "무료"
         title = title == "무료" ? "받기" : title
         
-        let attributes: [NSAttributedString.Key : Any] = [
-            .foregroundColor : UIColor.white.cgColor,
-            .font : UIFont.systemFont(ofSize: 14, weight: .semibold)
-        ]
-        
-        let attributedString = NSAttributedString(string: title,
-                                                  attributes: attributes)
+        let attributedString = title.attribute(size: 14,
+                                               weight: .semibold,
+                                               color: UIColor.white)
         
         downloadButton.setAttributedTitle(attributedString, for: .normal)
-        downloadButton.isHidden = true
         
         let barButtonItem = UIBarButtonItem(customView: downloadButton)
         navigationItem.rightBarButtonItem = barButtonItem
@@ -292,6 +286,8 @@ class AppDetailViewController: UIViewController {
         imageView.layer.borderColor =
             UIColor(named: "LightSilver")?.cgColor
         imageView.layer.borderWidth = 0.5
+        imageView.isHidden = true
+        
         return imageView
     }()
     
@@ -306,7 +302,8 @@ class AppDetailViewController: UIViewController {
         button.layer.borderColor =
             UIColor(named: "LightSilver")?.cgColor
         button.layer.borderWidth = 0.5
-        
+        button.isHidden = true
+    
         return button
     }()
     

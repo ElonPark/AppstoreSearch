@@ -34,7 +34,6 @@ extension SearchViewController {
         definesPresentationContext = true
     }
     
-    ///TODO: 앱 상세 보기
     func moveAppDetailVC(with model: ResultElement) {
         let appDetailVC = AppDetailViewController.instantiateVC()
         appDetailVC.searchResult = model
@@ -107,8 +106,7 @@ extension SearchViewController {
             .asDriver()
             .drive(onNext: { [unowned self] indexPath in
                 self.search(by: indexPath)
-                let cell = self.searchHistoryTableView.cellForRow(at: indexPath) as? HistoryCell
-                cell?.setSelected(false, animated: true)
+                self.searchHistoryTableView.deselectRow(at: indexPath, animated: false)
             })
             .disposed(by: disposeBag)
     }
@@ -193,8 +191,6 @@ extension SearchViewController {
     }
 }
 
-
-//TODO: 상세 화면은 제공되는 API내에서 최대한 구현
 
 class SearchViewController: UIViewController {
 

@@ -50,9 +50,7 @@ extension RelatedKeywordsViewController {
             .drive(onNext: { [unowned self] indexPath in
                 let text = self.dataSource.value[indexPath.row]
                 self.selectItem(text)
-                
-                let cell = self.relatedResultTableView.cellForRow(at: indexPath) as? RelatedResultCell
-                cell?.setSelected(false, animated: true)
+                self.relatedResultTableView.deselectRow(at: indexPath, animated: false)
             })
             .disposed(by: disposeBag)
     }

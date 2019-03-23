@@ -6,7 +6,8 @@
 //  Copyright © 2019 Elon. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
 
 extension String {
     /**
@@ -80,5 +81,73 @@ extension String {
             
             return numberFormatter.string(from: NSNumber(value: doubleValue)) ?? self
         }
+    }
+    
+  
+    /**
+     ## bold
+     
+     - Parameter size: 폰트 크기
+     - Parameter color: 폰트 컬러
+     */
+    func bold(size fontSize: CGFloat, color: UIColor? = nil) -> NSMutableAttributedString {
+        var attributes: [NSAttributedString.Key : Any] = [
+            .font: UIFont.boldSystemFont(ofSize: fontSize),
+            ]
+        
+        if let fontColor = color {
+            attributes[.foregroundColor] = fontColor
+        }
+        
+        let attributeFont = NSMutableAttributedString(string: self, attributes: attributes)
+        
+        return attributeFont
+    }
+    
+    /**
+     ## light
+     
+     - Parameter size: 폰트 크기
+     - Parameter color: 폰트 컬러
+     */
+    func light(size fontSize: CGFloat, color: UIColor? = nil) -> NSMutableAttributedString {
+        var attributes: [NSAttributedString.Key : Any] = [
+            .font: UIFont.systemFont(ofSize: fontSize, weight: .light),
+            ]
+        
+        if let fontColor = color {
+            attributes[.foregroundColor] = fontColor
+        }
+        
+        let attributeFont = NSMutableAttributedString(string: self, attributes: attributes)
+        
+        return attributeFont
+    }
+    
+    /**
+     ## 문자열 폰트 속성
+     
+     - Parameter size: 폰트 크기
+     - Parameter weight: 폰트 패밀리는 폰트 크기를 반드시 넣어야 적용됨.
+     - Parameter color: 폰트 컬러
+     */
+    func attribute(size: CGFloat? = nil, weight: UIFont.Weight? = nil, color: UIColor? = nil) -> NSMutableAttributedString {
+        var attributes = [NSAttributedString.Key : Any]()
+        
+        if let fontSize = size {
+            attributes[.font] = UIFont.systemFont(ofSize: fontSize)
+        }
+        
+        if let fontSize = size, let fontWeight = weight {
+            attributes[.font] = UIFont.systemFont(ofSize: fontSize, weight: fontWeight)
+        }
+        
+        if let fontColor = color {
+            attributes[.foregroundColor] = fontColor
+        }
+        
+        let attributeFont = NSMutableAttributedString(string: self, attributes: attributes)
+        
+        return attributeFont
     }
 }
