@@ -96,8 +96,7 @@ extension AppResultsViewController {
             .drive(onNext: { [unowned self] indexPath in
                 let result = self.dataSource.value[indexPath.row]
                 self.selectItem(result)
-                let cell = self.searchResultTableView.cellForRow(at: indexPath) as? SearchResultCell
-                cell?.setSelected(false, animated: true)
+                self.searchResultTableView.deselectRow(at: indexPath, animated: false)
             })
             .disposed(by: disposeBag)
     }

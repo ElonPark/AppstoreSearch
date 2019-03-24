@@ -12,21 +12,17 @@ import UIKit
 extension RelatedResultCell {
     
     func setTitle(text: String, with searchText: String) {
-        let attributes: [NSAttributedString.Key : Any] = [
-            .font: UIFont.systemFont(ofSize: 15),
-            .foregroundColor: UIColor(white: 0.56, alpha: 1.0)
-        ]
+        let whiteColor = UIColor(white: 0.56, alpha: 1.0)
+        let attributedString = text.attribute(size: 14,
+                                              weight: .regular,
+                                              color: whiteColor)
         
-        let attributedString = NSMutableAttributedString(string: text,
-                                                         attributes: attributes)
+        let nsString = NSString(string: text)
+        let range = nsString.range(of: searchText)
         
-        
-        if let range = text.range(of: searchText) {
-            let nsRange = NSRange(range, in: text)
-            attributedString.addAttribute(.foregroundColor,
-                                          value: UIColor.black,
-                                          range: nsRange)
-        }
+        attributedString.addAttribute(.foregroundColor,
+                                      value: UIColor.black,
+                                      range: range)
         
         titleLabel.attributedText = attributedString
     }

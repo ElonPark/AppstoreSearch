@@ -12,28 +12,29 @@ extension UILabel {
     
     func extendable(text: String, extened: Bool, lineHeightMultiple: Bool = false) {
         
-        
-        let font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        
-        var attributes: [NSAttributedString.Key : Any] = [
-            .font : font,
-            ]
+        let attributedString = text.attribute(size: 14,
+                                              weight: .regular,
+                                              color: self.textColor)
         
         if extened {
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.lineHeightMultiple = 1.5
-            attributes[.paragraphStyle] = paragraphStyle
+            let range = NSMakeRange(0, text.count)
+            attributedString.addAttribute(.paragraphStyle,
+                                          value: paragraphStyle,
+                                          range: range)
         }
         
-        let attributedString = NSAttributedString(string: text,
-                                                  attributes: attributes)
         if extened {
             let width = self.frame.width
-            let size = CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
+            let size = CGSize(width: width,
+                              height: CGFloat.greatestFiniteMagnitude)
             
-            let rect = attributedString.boundingRect(with: size,
-                                                     options: .usesLineFragmentOrigin,
-                                                     context: nil)
+            let rect = attributedString.boundingRect(
+                with: size,
+                options: .usesLineFragmentOrigin,
+                context: nil
+            )
             let lines = rect.height / (font.lineHeight * 1.5)
             self.numberOfLines = Int(lines)
             self.bounds = rect
@@ -41,5 +42,4 @@ extension UILabel {
         
         self.attributedText = attributedString
     }
-    
 }

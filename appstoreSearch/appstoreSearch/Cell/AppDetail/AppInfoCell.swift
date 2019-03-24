@@ -13,6 +13,7 @@ extension AppInfoCell {
     
     func initUI() {
         titleLabel.text = ""
+        titleLabel.textColor = UIColor.lightGray
         subTitleLabel.text = ""
         subTitleLabel.isHidden = false
         
@@ -25,7 +26,10 @@ extension AppInfoCell {
         showMoreImageViewConstraintWidth.constant = 0
     }
     
-    func setTitleLabel(to text: String) {
+    func setTitleLabel(to text: String, with type: DetailCellType) {
+        if type == .developerSite {
+            titleLabel.textColor = titleLabel.tintColor
+        }
         titleLabel.text = text
     }
     
@@ -57,7 +61,7 @@ extension AppInfoCell {
     
     func setUI(with model: Info) {
         self.needExtened = model.needExtened
-        setTitleLabel(to: model.title)
+        setTitleLabel(to: model.title, with: model.type)
         setSubTitleLabel(to: model.subTitle)
         setShowMoreImage(by: model.description)
         setDescriptionText(by: model.description)
