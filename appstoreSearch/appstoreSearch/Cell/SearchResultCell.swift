@@ -68,7 +68,6 @@ extension SearchResultCell {
     }
     
     ///TODO: 이미지 로딩 개선
-    ///FIXME: 이미지 크기에 따라 스택뷰 조절
     func setScreenShotImageViews(by urlStrings: [String]) {
         for index in 0..<screenShotImageViews.count {
             let imageView = screenShotImageViews[index]
