@@ -166,6 +166,7 @@ extension AppDetailViewController {
             info.needExtened = needExtened
             appMenu[index] = info
             dataSource.accept(appMenu)
+            
         default:
             break
         }
