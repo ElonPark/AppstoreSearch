@@ -11,18 +11,83 @@ import RxSwift
 import RxCocoa
 import SnapKit
 
+
+class AppDetailViewController: UIViewController {
+
+    
+    @IBOutlet weak var detailTableView: UITableView!
+    
+    var searchResult: ResultElement?
+    var cellFactory: AppDetailCellFactory?
+    private let disposeBag = DisposeBag()
+    private var appMenu = [AppDetailProtocol]()
+    
+    private lazy var appIconImageView: UIImageView  = {
+        let rect = CGRect(x: 0, y: 0, width: 30, height: 30)
+        let imageView = UIImageView(frame: rect)
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 8
+        imageView.layer.borderColor =
+            UIColor(named: "LightSilver")?.cgColor
+        imageView.layer.borderWidth = 0.5
+        imageView.isHidden = true
+        
+        return imageView
+    }()
+    
+   private lazy var downloadButton: UIButton = {
+        let rect = CGRect(x: 0, y: 0, width: 70, height: 30)
+        let button = UIButton(frame: rect)
+        button.backgroundColor = button.tintColor
+        
+        button.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
+        
+        button.layer.cornerRadius = 30 / 2
+        button.layer.borderColor =
+            UIColor(named: "LightSilver")?.cgColor
+        button.layer.borderWidth = 0.5
+        button.isHidden = true
+    
+        return button
+    }()
+    
+    lazy var dataSource = BehaviorRelay(value: appMenu)
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setNavigationBarIcon()
+        setNavigationBarButton()
+        
+        setDeatailTableView()
+        tableViewDidScroll()
+        dataBinding()
+        selectCellItem()
+        tapDownloadButton()
+        
+        setAppMenu()
+        dataSource.accept(appMenu)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setRrefersLargeTitles()
+        navigationBarShadow(isHidden: true)
+    }
+}
+
 extension AppDetailViewController {
     
-    func setRrefersLargeTitles() {
+    private func setRrefersLargeTitles() {
         let navigationBar = navigationController?.navigationBar
         navigationBar?.prefersLargeTitles = false
     }
     
-    func navigationBarShadow(isHidden: Bool) {
+    private func navigationBarShadow(isHidden: Bool) {
         navigationController?.navigationBar.setValue(isHidden, forKey: "hidesShadow")
     }
     
-    func setNavigationBarIcon() {
+    private func setNavigationBarIcon() {
         guard let urlString = searchResult?.artworkURL60 else { return }
         appIconImageView.rx_setImage(by: urlString)
             .disposed(by: disposeBag)
@@ -30,7 +95,7 @@ extension AppDetailViewController {
         navigationItem.titleView = appIconImageView
     }
     
-    func setNavigationBarButton() {
+    private func setNavigationBarButton() {
         guard let result = searchResult else { return }
         var title = result.formattedPrice ?? "무료"
         title = title == "무료" ? "받기" : title
@@ -45,14 +110,14 @@ extension AppDetailViewController {
         navigationItem.rightBarButtonItem = barButtonItem
     }
     
-    func setDeatailTableView() {
+    private func setDeatailTableView() {
         detailTableView.delegate = nil
         detailTableView.dataSource = nil
         detailTableView.rowHeight = UITableView.automaticDimension
         detailTableView.estimatedRowHeight = 100
     }
     
-    func setAppMenu() {
+    private func setAppMenu() {
         guard let result =  searchResult else { return }
         let factory = AppDetailFactory(result: result)
         
@@ -82,7 +147,7 @@ extension AppDetailViewController {
     }
     
     
-    func showShareSheet() {
+    private func showShareSheet() {
         guard let urlString = searchResult?.trackViewURL,
             let url = URL(string: urlString) else {
                 return
@@ -94,39 +159,39 @@ extension AppDetailViewController {
         present(activityVC, animated: true)
     }
     
-    func moveOutside(to urlString: String) {
+    private func moveOutside(to urlString: String) {
         guard let url = URL(string: urlString) else { return }
         UIApplication.shared.open(url)
     }
     
-    func moveAppstoreAppPage() {
+   private  func moveAppstoreAppPage() {
         guard let urlString = self.searchResult?.trackViewURL else { return }
         moveOutside(to: urlString)
     }
     
-    func moveAppStoreOtherApp() {
+    private func moveAppStoreOtherApp() {
         guard let artistID = searchResult?.artistID else { return }
         let appStoreURLString = "itms-apps://itunes.apple.com/developer/id\(artistID)"
         moveOutside(to: appStoreURLString)
     }
- 
-    func moveDeveloperSite() {
+    
+    private func moveDeveloperSite() {
         guard let urlString = searchResult?.sellerURL else { return }
         
         moveOutside(to: urlString)
     }
     
-    func etcAction() {
+    private func etcAction() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let share = UIAlertAction(title: "앱 공유하기", style: .default) { [weak self] (_) in
             self?.showShareSheet()
         }
-
+        
         let showOtherApp = UIAlertAction(title: "이 개발자의 다른 앱 보기", style: .default) { [weak self] (_) in
             self?.moveAppStoreOtherApp()
         }
- 
+        
         let alignmentMode = CATextLayerAlignmentMode.left
         let key = "titleTextAlignment"
         share.setValue(alignmentMode, forKey: key)
@@ -142,7 +207,7 @@ extension AppDetailViewController {
         present(alert, animated: true)
     }
     
-    func readMore(with index: Int, needExtened: Bool) {
+    private func readMore(with index: Int, needExtened: Bool) {
         let model = appMenu[index]
         
         switch model.type {
@@ -151,28 +216,29 @@ extension AppDetailViewController {
             guard !releaseNote.needExtened else { return }
             releaseNote.needExtened = needExtened
             appMenu[index] = releaseNote
-            dataSource.accept(appMenu)
-            
+
         case .description:
             guard let description = model as? Description else { return }
             guard !description.needExtened else { return }
             description.needExtened = needExtened
             appMenu[index] = description
-            dataSource.accept(appMenu)
             
         case .info:
             guard let info = model as? Info else { return }
             guard !info.needExtened else { return }
             info.needExtened = needExtened
             appMenu[index] = info
-            dataSource.accept(appMenu)
             
         default:
-            break
+            return
         }
+        
+        dataSource.accept(appMenu)
+        let indexPath = IndexPath(row: index, section: 0)
+        detailTableView.scrollToRow(at: indexPath, at: .top, animated: false)
     }
     
-    func makeCell(table: UITableView, index: Int, model: AppDetailProtocol) -> UITableViewCell {
+    private func makeCell(table: UITableView, index: Int, model: AppDetailProtocol) -> UITableViewCell {
         guard let factory = cellFactory else { return UITableViewCell() }
         
         switch model.type {
@@ -206,17 +272,17 @@ extension AppDetailViewController {
         }
     }
     
-    func dataBinding() {
+    private func dataBinding() {
         dataSource.observeOn(MainScheduler.instance)
             .bind(to: detailTableView.rx.items) { [unowned self] table, index, model in
                 return self.makeCell(table: table,
                                      index: index,
                                      model: model)
             }
-        .disposed(by: disposeBag)
+            .disposed(by: disposeBag)
     }
     
-    func selectItem(by indexPath: IndexPath) {
+    private func selectItem(by indexPath: IndexPath) {
         switch appMenu[indexPath.row].type {
         case .developerInfo:
             moveAppStoreOtherApp()
@@ -227,7 +293,7 @@ extension AppDetailViewController {
         }
     }
     
-    func selectCellItem() {
+    private func selectCellItem() {
         detailTableView
             .rx.itemSelected
             .asDriver()
@@ -237,7 +303,7 @@ extension AppDetailViewController {
             .disposed(by: disposeBag)
     }
     
-    func tapDownloadButton() {
+    private func tapDownloadButton() {
         downloadButton
             .rx.tap
             .asDriver()
@@ -247,7 +313,7 @@ extension AppDetailViewController {
             .disposed(by: disposeBag)
     }
     
-    func showNaviItemIfNeed(with offset: CGPoint) {
+    private func showNaviItemIfNeed(with offset: CGPoint) {
         let index = IndexPath(row: 0, section: 0)
         let cell = detailTableView.cellForRow(at: index)
         if let height = cell?.frame.height {
@@ -256,7 +322,7 @@ extension AppDetailViewController {
         }
     }
     
-    func tableViewDidScroll() {
+    private func tableViewDidScroll() {
         detailTableView
             .rx.contentOffset
             .asDriver()
@@ -264,78 +330,5 @@ extension AppDetailViewController {
                 self.showNaviItemIfNeed(with: contentOffset)
             })
             .disposed(by: disposeBag)
-    }
-}
-
-class AppDetailViewController: UIViewController {
-
-    
-    @IBOutlet weak var detailTableView: UITableView!
-    
-    var searchResult: ResultElement?
-    var cellFactory: AppDetailCellFactory?
-    let disposeBag = DisposeBag()
-    
-    var appMenu = [AppDetailProtocol]()
-    
-    lazy var appIconImageView: UIImageView  = {
-        let rect = CGRect(x: 0, y: 0, width: 30, height: 30)
-        let imageView = UIImageView(frame: rect)
-        imageView.contentMode = .scaleAspectFit
-        imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 8
-        imageView.layer.borderColor =
-            UIColor(named: "LightSilver")?.cgColor
-        imageView.layer.borderWidth = 0.5
-        imageView.isHidden = true
-        
-        return imageView
-    }()
-    
-   lazy var downloadButton: UIButton = {
-        let rect = CGRect(x: 0, y: 0, width: 70, height: 30)
-        let button = UIButton(frame: rect)
-        button.backgroundColor = button.tintColor
-        
-        button.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
-        
-        button.layer.cornerRadius = 30 / 2
-        button.layer.borderColor =
-            UIColor(named: "LightSilver")?.cgColor
-        button.layer.borderWidth = 0.5
-        button.isHidden = true
-    
-        return button
-    }()
-    
-    lazy var dataSource = BehaviorRelay(value: appMenu)
-    
-    class func instantiateVC() -> AppDetailViewController {
-        let identifier = "AppDetailViewController"
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let appDetailVC = storyboard.instantiateViewController(withIdentifier: identifier)
-        
-        return appDetailVC as! AppDetailViewController
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setNavigationBarIcon()
-        setNavigationBarButton()
-        
-        setDeatailTableView()
-        tableViewDidScroll()
-        dataBinding()
-        selectCellItem()
-        tapDownloadButton()
-        
-        setAppMenu()
-        dataSource.accept(appMenu)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        setRrefersLargeTitles()
-        navigationBarShadow(isHidden: true)
     }
 }

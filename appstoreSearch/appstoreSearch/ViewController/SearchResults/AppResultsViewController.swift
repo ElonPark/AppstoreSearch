@@ -11,17 +11,37 @@ import RxSwift
 import RxCocoa
 
 
-extension AppResultsViewController {
-    
-    func setSearchResultTableView() {
-        searchResultTableView.delegate = nil
-        searchResultTableView.dataSource = nil
+class AppResultsViewController: ResultTypeController {
 
-        searchResultTableView.rowHeight = UITableView.automaticDimension
-        searchResultTableView.estimatedRowHeight = 310
+    @IBOutlet weak var resultEmptyView: UIView!
+    @IBOutlet weak var resultEmptyLabel: UILabel!
+    @IBOutlet weak var searchTextLabel: UILabel!
+    
+    @IBOutlet weak var searchResultTableView: UITableView!
+    
+    private let disposeBag = DisposeBag()
+    
+    var searchResult: Result?
+    let rx_searchText = BehaviorRelay(value: String())
+    let dataSource = BehaviorRelay(value: [ResultElement]())
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        setSearchResultTableView()
+        searchText()
+        dataBinding()
+        selectCellItem()
     }
     
-    func errorAlert(_ error: Error) {
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+    }
+}
+
+extension AppResultsViewController {
+    
+    private func errorAlert(_ error: Error) {
         let alert = UIAlertController(title: "",
                                       message: error.localizedDescription,
                                       preferredStyle: .alert)
@@ -31,26 +51,34 @@ extension AppResultsViewController {
         present(alert, animated: true)
     }
     
-    func setResultEmptyView(with searchText: String) {
+   private func setSearchResultTableView() {
+        searchResultTableView.delegate = nil
+        searchResultTableView.dataSource = nil
+        
+        searchResultTableView.rowHeight = UITableView.automaticDimension
+        searchResultTableView.estimatedRowHeight = 310
+    }
+    
+    private func setResultEmptyView(with searchText: String) {
         searchTextLabel.text = "'\(searchText)'"
     }
     
-    func updateDataSource(by result: Result) {
+    private func updateDataSource(by result: Result) {
         searchResult = result
         dataSource.accept(result.results)
     }
     
-    func showResultEmptyView() {
+    private func showResultEmptyView() {
         searchResult = nil
         searchResultTableView.isHidden = true
     }
     
-    func checkResultCount() {
+    private func checkResultCount() {
         guard let result = searchResult else { return }
         searchResultTableView.isHidden = result.resultCount < 1
     }
     
-    func search(by keyword: String) {
+    private func search(by keyword: String) {
         API.shared.searchAppsotre(by: keyword.removeJamo())
             .retry(2)
             .observeOn(ConcurrentDispatchQueueScheduler(qos: .default))
@@ -66,7 +94,7 @@ extension AppResultsViewController {
             .disposed(by: disposeBag)
     }
     
-    func searchText() {
+    private func searchText() {
         rx_searchText
             .debounce(0.3, scheduler: MainScheduler.instance)
             .distinctUntilChanged()
@@ -77,8 +105,10 @@ extension AppResultsViewController {
             }
             .disposed(by: disposeBag)
     }
-    
-    func dataBinding() {
+}
+
+extension AppResultsViewController {
+    private func dataBinding() {
         dataSource
             .asDriver()
             .drive(searchResultTableView.rx.items(
@@ -89,7 +119,7 @@ extension AppResultsViewController {
             .disposed(by: disposeBag)
     }
     
-    func selectCellItem() {
+    private func selectCellItem() {
         searchResultTableView
             .rx.itemSelected
             .asDriver()
@@ -99,42 +129,5 @@ extension AppResultsViewController {
                 self.searchResultTableView.deselectRow(at: indexPath, animated: false)
             })
             .disposed(by: disposeBag)
-    }
-}
-
-class AppResultsViewController: ResultTypeController {
-
-    @IBOutlet weak var resultEmptyView: UIView!
-    @IBOutlet weak var resultEmptyLabel: UILabel!
-    @IBOutlet weak var searchTextLabel: UILabel!
-    
-    @IBOutlet weak var searchResultTableView: UITableView!
-    
-    let disposeBag = DisposeBag()
-    
-    var searchResult: Result?
-    let rx_searchText = BehaviorRelay(value: String())
-    let dataSource = BehaviorRelay(value: [ResultElement]())
-    
-    
-    class func instantiateVC() -> AppResultsViewController {
-        let identifier = "AppResultsViewController"
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let appResultsVC = storyboard.instantiateViewController(withIdentifier: identifier)
-        
-        return appResultsVC as! AppResultsViewController
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        setSearchResultTableView()
-        searchText()
-        dataBinding()
-        selectCellItem()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
     }
 }
