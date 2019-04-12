@@ -9,28 +9,7 @@
 import UIKit
 
 
-extension DeveloperInfoCell {
-    
-    func initUI() {
-        titleLabel.text = ""
-        subTitleLabel.text = ""
-        showMoreImageView.image = UIImage(named: "rightArrow")
-    }
-    
-    func setTitle(text: String) {
-        titleLabel.text = text
-    }
-    func setSubTitle(text: String) {
-        subTitleLabel.text = text
-    }
- 
-    func setUI(with model: Info) {
-        setTitle(text: model.title)
-        setSubTitle(text: model.subTitle)
-    }
-}
-
-class DeveloperInfoCell: UITableViewCell {
+final class DeveloperInfoCell: UITableViewCell {
 
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var subTitleLabel: UILabel!
@@ -41,5 +20,27 @@ class DeveloperInfoCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         initUI()
+    }
+}
+
+extension DeveloperInfoCell {
+    
+    private func initUI() {
+        titleLabel.text = ""
+        subTitleLabel.text = ""
+        showMoreImageView.image = UIImage(named: "rightArrow")
+    }
+    
+    private func setTitle(text: String) {
+        titleLabel.text = text
+    }
+    
+    private func setSubTitle(text: String) {
+        subTitleLabel.text = text
+    }
+    
+    func setUI(with model: Info) {
+        setTitle(text: model.title)
+        setSubTitle(text: model.subTitle)
     }
 }

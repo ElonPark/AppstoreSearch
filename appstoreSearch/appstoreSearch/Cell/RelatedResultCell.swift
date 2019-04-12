@@ -8,6 +8,24 @@
 
 import UIKit
 
+final class RelatedResultCell: UITableViewCell {
+
+    @IBOutlet weak var searchIconImageView: UIImageView!
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var lineView: UIView!
+    
+    static let identifier = "RelatedResultCell"
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        titleLabel.text = ""
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        titleLabel.text = ""
+    }
+}
 
 extension RelatedResultCell {
     
@@ -27,24 +45,4 @@ extension RelatedResultCell {
         titleLabel.attributedText = attributedString
     }
     
-}
-
-class RelatedResultCell: UITableViewCell {
-
-    @IBOutlet weak var searchIconImageView: UIImageView!
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var lineView: UIView!
-    
-    
-    static let identifier = "RelatedResultCell"
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        titleLabel.text = ""
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        titleLabel.text = ""
-    }
 }

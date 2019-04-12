@@ -10,14 +10,37 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-extension RelatedKeywordsViewController {
 
-    func setRelatedResultTableView() {
+final class RelatedKeywordsViewController: ResultTypeController {
+
+    @IBOutlet weak var relatedResultTableView: UITableView!
+    @IBOutlet weak var tableViewHaderSpaceView: UIView!
+    
+    private let disposeBag = DisposeBag()
+    
+    var relatedResults = [String]()
+    lazy var rx_searchText = BehaviorRelay(value: String())
+    lazy var dataSource = BehaviorRelay(value: relatedResults)
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        setRelatedResultTableView()
+        
+        dataBinding()
+        searchText()
+        selectCellItem()
+    }
+}
+
+extension RelatedKeywordsViewController {
+    
+    private func setRelatedResultTableView() {
         relatedResultTableView.delegate = nil
         relatedResultTableView.dataSource = nil
     }
     
-    func searchText() {
+    private func searchText() {
         rx_searchText
             .distinctUntilChanged()
             .observeOn(MainScheduler.instance)
@@ -31,7 +54,7 @@ extension RelatedKeywordsViewController {
             .disposed(by: disposeBag)
     }
     
-    func dataBinding() {
+    private func dataBinding() {
         dataSource
             .asDriver()
             .drive(relatedResultTableView.rx.items(
@@ -43,7 +66,7 @@ extension RelatedKeywordsViewController {
             .disposed(by: disposeBag)
     }
     
-    func selectCellItem() {
+    private func selectCellItem() {
         relatedResultTableView
             .rx.itemSelected
             .asDriver()
@@ -53,36 +76,5 @@ extension RelatedKeywordsViewController {
                 self.relatedResultTableView.deselectRow(at: indexPath, animated: false)
             })
             .disposed(by: disposeBag)
-    }
-}
-
-class RelatedKeywordsViewController: ResultTypeController {
-
-    @IBOutlet weak var relatedResultTableView: UITableView!
-    @IBOutlet weak var tableViewHaderSpaceView: UIView!
-    
-    let disposeBag = DisposeBag()
-    
-    var relatedResults = [String]()
-    lazy var rx_searchText = BehaviorRelay(value: String())
-    lazy var dataSource = BehaviorRelay(value: relatedResults)
-   
-    
-    class func instantiateVC() -> RelatedKeywordsViewController {
-        let identifier = "RelatedKeywordsViewController"
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let relatedResultVC = storyboard.instantiateViewController(withIdentifier: identifier)
-        
-        return relatedResultVC as! RelatedKeywordsViewController
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        setRelatedResultTableView()
-        
-        dataBinding()
-        searchText()
-        selectCellItem()
     }
 }

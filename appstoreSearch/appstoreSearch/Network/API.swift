@@ -14,7 +14,7 @@ enum HTTP: String {
     case post = "POST"
 }
 
-class API {
+final class API {
     
     static var shared = API()
     let hostURL = "https://itunes.apple.com"

@@ -112,7 +112,8 @@ struct AppDetailFactory {
                 break
             }
             
-            fileSize = "\(file.rounded(toPlaces: 1, rule: .up))" + unit
+            let size = String(file.rounded(toPlaces: 1, rule: .up))
+            fileSize = size + unit
         }
         
         return Info(type: .info,

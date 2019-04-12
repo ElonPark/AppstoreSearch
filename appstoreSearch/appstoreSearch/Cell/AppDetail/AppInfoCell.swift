@@ -9,68 +9,7 @@
 import UIKit
 
 
-extension AppInfoCell {
-    
-    func initUI() {
-        titleLabel.text = ""
-        titleLabel.textColor = UIColor.lightGray
-        subTitleLabel.text = ""
-        subTitleLabel.isHidden = false
-        
-        descriptionLabelConstraintBottom.constant = 0
-        descriptionLabel.text = ""
-        
-        showMoreImageView.image = nil
-        showMoreImageView.isHidden = true
-        showMoreImageViewConstraintLeading.constant = 0
-        showMoreImageViewConstraintWidth.constant = 0
-    }
-    
-    func setTitleLabel(to text: String, with type: DetailCellType) {
-        if type == .developerSite {
-            titleLabel.textColor = titleLabel.tintColor
-        }
-        titleLabel.text = text
-    }
-    
-    func setSubTitleLabel(to text: String) {
-        if needExtened {
-            subTitleLabel.isHidden = true
-        } else {
-            subTitleLabel.text = text
-        }
-    }
-    
-    func setShowMoreImage(by description: String) {
-        guard !description.isEmpty else { return }
-        guard !needExtened else { return }
-        
-        showMoreImageView.image = UIImage(named: "bottomArrow")
-        showMoreImageView.isHidden = false
-        showMoreImageViewConstraintLeading.constant = constraintLeading
-        showMoreImageViewConstraintWidth.constant = showMoreImageViewWidth
-    }
-    
-    func setDescriptionText(by text: String) {
-        guard !text.isEmpty else { return }
-        guard needExtened else { return }
-        
-        descriptionLabel.extendable(text: text, extened: needExtened)
-        descriptionLabelConstraintBottom.constant = constraintBottom
-    }
-    
-    func setUI(with model: Info) {
-        self.needExtened = model.needExtened
-        setTitleLabel(to: model.title, with: model.type)
-        setSubTitleLabel(to: model.subTitle)
-        setShowMoreImage(by: model.description)
-        setDescriptionText(by: model.description)
-    }
-    
-}
-
-
-class AppInfoCell: UITableViewCell {
+final class AppInfoCell: UITableViewCell {
 
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var subTitleLabel: UILabel!
@@ -101,4 +40,64 @@ class AppInfoCell: UITableViewCell {
         super.prepareForReuse()
         initUI()
     }
+}
+
+extension AppInfoCell {
+    
+    private func initUI() {
+        titleLabel.text = ""
+        titleLabel.textColor = UIColor.lightGray
+        subTitleLabel.text = ""
+        subTitleLabel.isHidden = false
+        
+        descriptionLabelConstraintBottom.constant = 0
+        descriptionLabel.text = ""
+        
+        showMoreImageView.image = nil
+        showMoreImageView.isHidden = true
+        showMoreImageViewConstraintLeading.constant = 0
+        showMoreImageViewConstraintWidth.constant = 0
+    }
+    
+    private func setTitleLabel(to text: String, with type: DetailCellType) {
+        if type == .developerSite {
+            titleLabel.textColor = titleLabel.tintColor
+        }
+        titleLabel.text = text
+    }
+    
+    private func setSubTitleLabel(to text: String) {
+        if needExtened {
+            subTitleLabel.isHidden = true
+        } else {
+            subTitleLabel.text = text
+        }
+    }
+    
+    private func setShowMoreImage(by description: String) {
+        guard !description.isEmpty else { return }
+        guard !needExtened else { return }
+        
+        showMoreImageView.image = UIImage(named: "bottomArrow")
+        showMoreImageView.isHidden = false
+        showMoreImageViewConstraintLeading.constant = constraintLeading
+        showMoreImageViewConstraintWidth.constant = showMoreImageViewWidth
+    }
+    
+    private func setDescriptionText(by text: String) {
+        guard !text.isEmpty else { return }
+        guard needExtened else { return }
+        
+        descriptionLabel.extendable(text: text, extened: needExtened)
+        descriptionLabelConstraintBottom.constant = constraintBottom
+    }
+    
+    func setUI(with model: Info) {
+        self.needExtened = model.needExtened
+        setTitleLabel(to: model.title, with: model.type)
+        setSubTitleLabel(to: model.subTitle)
+        setShowMoreImage(by: model.description)
+        setDescriptionText(by: model.description)
+    }
+    
 }

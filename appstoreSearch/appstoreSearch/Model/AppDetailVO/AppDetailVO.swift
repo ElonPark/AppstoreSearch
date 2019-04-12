@@ -39,7 +39,7 @@ class Description: AppDetailProtocol {
     }
 }
 
-class ReleaseNote: Description {
+final class ReleaseNote: Description {
     
     var version: String
     var updateDate: Date
@@ -68,7 +68,7 @@ struct InfoTitle: AppDetailProtocol {
     var title: String
 }
 
-class Info: AppDetailProtocol {
+final class Info: AppDetailProtocol {
     var type: DetailCellType
     var title: String
     var subTitle: String

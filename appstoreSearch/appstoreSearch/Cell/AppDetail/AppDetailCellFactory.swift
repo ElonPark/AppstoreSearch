@@ -8,10 +8,9 @@
 
 import UIKit
 
-class AppDetailCellFactory {
+final class AppDetailCellFactory {
     
     let searchResult: ResultElement
-    let selectItem: (() -> Void) = {}
     
     init(result: ResultElement) {
         searchResult = result

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class HistoryCell: UITableViewCell {
+final class HistoryCell: UITableViewCell {
 
     @IBOutlet weak var lineView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
@@ -31,5 +31,4 @@ class HistoryCell: UITableViewCell {
         titleLabel.textColor = selected ? UIColor.white : tintColor
         contentView.backgroundColor = selected ? tintColor : UIColor.white
     }
-
 }
