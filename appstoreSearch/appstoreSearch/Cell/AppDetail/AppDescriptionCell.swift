@@ -11,15 +11,32 @@ import RxSwift
 import RxCocoa
 
 
+final class AppDescriptionCell: UITableViewCell {
+
+    @IBOutlet weak var lineView: UIView!
+    @IBOutlet weak var descriptionLabel: UILabel!
+    @IBOutlet weak var readMoreButton: UIButton!
+    
+    private let disposeBag = DisposeBag()
+    static let identifier = "AppDescriptionCell"
+    var needExtened: Bool = false
+    var readMore: (Bool) -> Void = {_ in }
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+
+    }
+}
+
 extension AppDescriptionCell {
     
-    func initUI() {
+    private func initUI() {
         descriptionLabel.text = ""
         descriptionLabel.numberOfLines = 3
         readMoreButton.isHidden = true
     }
     
-    func setDescription(by text: String) {
+    private func setDescription(by text: String) {
         let count = text.components(separatedBy: "\n").count
         
         if needExtened {
@@ -33,7 +50,7 @@ extension AppDescriptionCell {
                                     lineHeightMultiple: true)
     }
     
-    func tapReadMore() {
+    private func tapReadMore() {
         readMoreButton
             .rx.tap
             .asDriver()
@@ -47,22 +64,5 @@ extension AppDescriptionCell {
         self.needExtened = model.needExtened
         setDescription(by: model.text)
         tapReadMore()
-    }
-}
-
-class AppDescriptionCell: UITableViewCell {
-
-    @IBOutlet weak var lineView: UIView!
-    @IBOutlet weak var descriptionLabel: UILabel!
-    @IBOutlet weak var readMoreButton: UIButton!
-    
-    let disposeBag = DisposeBag()
-    static let identifier = "AppDescriptionCell"
-    var needExtened: Bool = false
-    var readMore: (Bool) -> Void = {_ in }
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-
     }
 }

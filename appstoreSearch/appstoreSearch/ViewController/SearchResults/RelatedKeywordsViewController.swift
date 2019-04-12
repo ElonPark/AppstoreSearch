@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 
 
-class RelatedKeywordsViewController: ResultTypeController {
+final class RelatedKeywordsViewController: ResultTypeController {
 
     @IBOutlet weak var relatedResultTableView: UITableView!
     @IBOutlet weak var tableViewHaderSpaceView: UIView!

@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 
 
-class AppResultsViewController: ResultTypeController {
+final class AppResultsViewController: ResultTypeController {
 
     @IBOutlet weak var resultEmptyView: UIView!
     @IBOutlet weak var resultEmptyLabel: UILabel!
@@ -108,6 +108,7 @@ extension AppResultsViewController {
 }
 
 extension AppResultsViewController {
+    
     private func dataBinding() {
         dataSource
             .asDriver()

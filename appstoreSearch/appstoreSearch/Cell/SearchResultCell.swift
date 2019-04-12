@@ -11,9 +11,41 @@ import RxSwift
 import RxCocoa
 import Cosmos
 
+final class SearchResultCell: UITableViewCell {
+
+    @IBOutlet weak var appIconImageView: UIImageView!
+    @IBOutlet weak var titleStackView: UIStackView!
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var subTitleLabel: UILabel!
+    @IBOutlet weak var userRatingView: UIView!
+    @IBOutlet weak var starRatingView: CosmosView!
+    @IBOutlet weak var ratingLabel: UILabel!
+    
+    @IBOutlet weak var downloadButton: UIButton!
+    
+    @IBOutlet weak var screenShotStackView: UIStackView!
+    @IBOutlet var screenShotImageViews: [UIImageView]!
+    
+    
+    private let disposeBag = DisposeBag()
+    static let identifier = "SearchResultCell"
+    
+    var resultElement: ResultElement? = nil
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        initCell()
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        initCell()
+    }
+}
+
 extension SearchResultCell {
     
-    func initCell() {
+    private func initCell() {
         appIconImageView.image = nil
         titleLabel.text = ""
         subTitleLabel.text = ""
@@ -25,13 +57,13 @@ extension SearchResultCell {
         }
     }
     
-    func setAppIconImageView(by urlString: String) {
+    private func setAppIconImageView(by urlString: String) {
         appIconImageView
             .rx_setImage(by: urlString)
             .disposed(by: disposeBag)
     }
     
-    func setTitleLabel(text: String) {
+    private func setTitleLabel(text: String) {
         titleLabel.text = text
     }
     
@@ -39,7 +71,7 @@ extension SearchResultCell {
         subTitleLabel.text = text
     }
     
-    func setStarRating(value: Double?) {
+    private func setStarRating(value: Double?) {
         starRatingView.isHidden = value == nil ? true : false
         guard let averageUserRating = value else { return }
         starRatingView.settings.fillMode = .precise
@@ -47,7 +79,7 @@ extension SearchResultCell {
         starRatingView.rating = averageUserRating
     }
     
-    func setRatingLabel(value: Int?) {
+    private func setRatingLabel(value: Int?) {
         guard let userRatingCount = value else { return }
         let ratingCountText = { (number: Double) -> String in
             var count = Double(userRatingCount) / number
@@ -68,7 +100,7 @@ extension SearchResultCell {
     }
     
     ///TODO: 이미지 로딩 개선
-    func setScreenShotImageViews(by urlStrings: [String]) {
+    private func setScreenShotImageViews(by urlStrings: [String]) {
         for index in 0..<screenShotImageViews.count {
             let imageView = screenShotImageViews[index]
             if let urlString = urlStrings[safe: index] {
@@ -81,7 +113,7 @@ extension SearchResultCell {
         }
     }
     
-    func setDownloadButton(title: String?) {
+    private func setDownloadButton(title: String?) {
         var buttonTitle = title ?? "무료"
         if buttonTitle == "무료" {
             buttonTitle = "받기"
@@ -92,7 +124,7 @@ extension SearchResultCell {
     }
     
     ///다운로드를 누르면 앱스토어 앱 상세페이지로 이동
-    func tapDownload(with url: String) {
+    private func tapDownload(with url: String) {
         downloadButton
             .rx.tap
             .asDriver()
@@ -114,37 +146,5 @@ extension SearchResultCell {
         setDownloadButton(title: model.formattedPrice)
         tapDownload(with: model.trackViewURL)
         
-    }
-}
-
-class SearchResultCell: UITableViewCell {
-
-    @IBOutlet weak var appIconImageView: UIImageView!
-    @IBOutlet weak var titleStackView: UIStackView!
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var subTitleLabel: UILabel!
-    @IBOutlet weak var userRatingView: UIView!
-    @IBOutlet weak var starRatingView: CosmosView!
-    @IBOutlet weak var ratingLabel: UILabel!
-    
-    @IBOutlet weak var downloadButton: UIButton!
-    
-    @IBOutlet weak var screenShotStackView: UIStackView!
-    @IBOutlet var screenShotImageViews: [UIImageView]!
-    
-    
-    let disposeBag = DisposeBag()
-    static let identifier = "SearchResultCell"
-    
-    var resultElement: ResultElement? = nil
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        initCell()
-    }
-
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        initCell()
     }
 }

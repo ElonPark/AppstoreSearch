@@ -11,36 +11,11 @@ import RxSwift
 import RxCocoa
 
 
-extension ScreenShotCell {
-    
-    func dataBinding() {
-        dataSource
-            .observeOn(MainScheduler.instance)
-            .bind(to: imageCollectionView.rx.items) { collectionView, item, urlString in
-                let index = IndexPath(item: item, section: 0)
-                let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: ScreenShotImageCell.identifier,
-                    for: index
-                ) as! ScreenShotImageCell
-                cell.setImage(by: urlString)
-                
-                return cell
-            }
-            .disposed(by: disposeBag)
-    
-    }
-    
-    func setScreenShot(with model: ScreenShots) {
-        dataSource.accept(model.urlStrings)
-    }
-}
-
-
-class ScreenShotCell: UITableViewCell {
+final class ScreenShotCell: UITableViewCell {
 
     @IBOutlet weak var imageCollectionView: UICollectionView!
     
-    let disposeBag = DisposeBag()
+    private let disposeBag = DisposeBag()
     static let identifier: String = "ScreenShotCell"
     
     lazy var dataSource = BehaviorRelay(value: [String]())
@@ -51,5 +26,29 @@ class ScreenShotCell: UITableViewCell {
         imageCollectionView.delegate = nil
         dataBinding()
         
+    }
+}
+
+extension ScreenShotCell {
+    
+    private func dataBinding() {
+        dataSource
+            .observeOn(MainScheduler.instance)
+            .bind(to: imageCollectionView.rx.items) { collectionView, item, urlString in
+                let index = IndexPath(item: item, section: 0)
+                let cell = collectionView.dequeueReusableCell(
+                    withReuseIdentifier: ScreenShotImageCell.identifier,
+                    for: index
+                    ) as! ScreenShotImageCell
+                cell.setImage(by: urlString)
+                
+                return cell
+            }
+            .disposed(by: disposeBag)
+        
+    }
+    
+    func setScreenShot(with model: ScreenShots) {
+        dataSource.accept(model.urlStrings)
     }
 }

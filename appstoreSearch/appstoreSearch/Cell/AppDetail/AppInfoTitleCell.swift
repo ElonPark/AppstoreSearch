@@ -8,14 +8,8 @@
 
 import UIKit
 
-extension AppInfoTitleCell {
-    
-    func setTitle(text: String) {
-        titleLabel.text = text
-    }
-}
 
-class AppInfoTitleCell: UITableViewCell {
+final class AppInfoTitleCell: UITableViewCell {
     
     @IBOutlet weak var lineView: UIView!
     @IBOutlet weak var titleLabel: UILabel!
@@ -25,5 +19,11 @@ class AppInfoTitleCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         titleLabel.text = ""
+    }
+}
+
+extension AppInfoTitleCell {
+    func setTitle(text: String) {
+        titleLabel.text = text
     }
 }

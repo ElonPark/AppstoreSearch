@@ -12,9 +12,32 @@ import RxCocoa
 import Cosmos
 
 
+final class AppRatingCell: UITableViewCell {
+
+    @IBOutlet weak var ratingScoreLabel: UILabel!
+    @IBOutlet weak var ratingScoreLabelCostraintWidth: NSLayoutConstraint!
+    @IBOutlet weak var starRatingView: CosmosView!
+    @IBOutlet weak var ratingCountLabel: UILabel!
+    
+    @IBOutlet weak var rankLabel: UILabel!
+    @IBOutlet weak var categoryLabel: UILabel!
+    @IBOutlet weak var ageLabel: UILabel!
+    @IBOutlet weak var ageTitleLabel: UILabel!
+    
+    
+    
+    private let disposeBag = DisposeBag()
+    static let identifier = "AppRatingCell"
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        initUI()
+    }
+}
+
 extension AppRatingCell {
     
-    func initUI() {
+    private func initUI() {
         ratingScoreLabel.text = ""
         ratingScoreLabelCostraintWidth.constant = 0
         starRatingView.rating = 0
@@ -28,20 +51,20 @@ extension AppRatingCell {
         ageTitleLabel.text = "연령"
     }
     
-    func setRatingLabel(by userRating: Double?) {
+    private func setRatingLabel(by userRating: Double?) {
         guard let rating = userRating else { return }
         ratingScoreLabelCostraintWidth.constant = 30
         ratingScoreLabel.text = String(rating)
     }
     
-    func setStarRating(by userRating: Double?) {
+    private func setStarRating(by userRating: Double?) {
         guard let rating = userRating else { return }
         
         starRatingView.rating = rating
         starRatingView.settings.starSize = 20
     }
     
-    func setRatingCount(by ratingCount: Int?) {
+    private func setRatingCount(by ratingCount: Int?) {
         guard let userRatingCount = ratingCount else { return }
         let ratingCountText = { (number: Double) -> String in
             var count = Double(userRatingCount) / number
@@ -62,16 +85,16 @@ extension AppRatingCell {
     }
     
     ///데이터 없음
-    func setRank(by rank: Int = 0) {
+    private func setRank(by rank: Int = 0) {
         rankLabel.text = "#\(rank)"
     }
     
-    func setCategory(by category: String?) {
+    private func setCategory(by category: String?) {
         guard let primaryCategory = category else { return }
         categoryLabel.text = primaryCategory
     }
     
-    func setAge(by age: String) {
+    private func setAge(by age: String) {
         ageLabel.text = age
     }
     
@@ -82,28 +105,5 @@ extension AppRatingCell {
         setRank()
         setCategory(by: model.category[0])
         setAge(by: model.contentRating)
-    }
-}
-
-class AppRatingCell: UITableViewCell {
-
-    @IBOutlet weak var ratingScoreLabel: UILabel!
-    @IBOutlet weak var ratingScoreLabelCostraintWidth: NSLayoutConstraint!
-    @IBOutlet weak var starRatingView: CosmosView!
-    @IBOutlet weak var ratingCountLabel: UILabel!
-    
-    @IBOutlet weak var rankLabel: UILabel!
-    @IBOutlet weak var categoryLabel: UILabel!
-    @IBOutlet weak var ageLabel: UILabel!
-    @IBOutlet weak var ageTitleLabel: UILabel!
-    
-    
-    
-    let disposeBag = DisposeBag()
-    static let identifier = "AppRatingCell"
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        initUI()
     }
 }

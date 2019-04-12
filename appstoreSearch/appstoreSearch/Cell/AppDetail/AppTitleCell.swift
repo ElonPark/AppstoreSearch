@@ -10,23 +10,42 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+
+final class AppTitleCell: UITableViewCell {
+    
+    @IBOutlet weak var appIconImageView: UIImageView!
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var subTitleLabel: UILabel!
+    @IBOutlet weak var downloadButton: UIButton!
+    @IBOutlet weak var etcButton: UIButton!
+    
+    private let disposeBag = DisposeBag()
+    static let identifier = "AppTitleCell"
+    
+    var etcAction: (() -> Void) = {}
+
+    override func awakeFromNib() {
+        super.awakeFromNib()
+    }
+}
+
 extension AppTitleCell {
     
-    func setAppIcon(by urlString: String) {
+    private func setAppIcon(by urlString: String) {
         appIconImageView
             .rx_setImage(by: urlString)
             .disposed(by: disposeBag)
     }
     
-    func setTitleLabel(to text: String) {
+    private func setTitleLabel(to text: String) {
         titleLabel.text = text
     }
     
-    func setSubTitleLabel(to text: String) {
+    private func setSubTitleLabel(to text: String) {
         subTitleLabel.text = text
     }
     
-    func setDownloadButton(title: String?) {
+    private func setDownloadButton(title: String?) {
         var buttonTitle = title ?? "무료"
         if buttonTitle == "무료" {
             buttonTitle = "받기"
@@ -36,12 +55,12 @@ extension AppTitleCell {
         downloadButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
     }
     
-    func moveOutsideApp(to urlString: String) {
+    private func moveOutsideApp(to urlString: String) {
         guard let url = URL(string: urlString) else { return }
         UIApplication.shared.open(url)
     }
     
-    func tapDownload(with url: String) {
+    private func tapDownload(with url: String) {
         downloadButton
             .rx.tap
             .asDriver()
@@ -52,7 +71,7 @@ extension AppTitleCell {
     }
     
     
-    func tapETCButton() {
+    private func tapETCButton() {
         etcButton
             .rx.tap
             .asDriver()
@@ -69,24 +88,5 @@ extension AppTitleCell {
         setDownloadButton(title: model.price)
         tapDownload(with: model.appStoreURL)
         tapETCButton()
-    }
-}
-
-
-class AppTitleCell: UITableViewCell {
-    
-    @IBOutlet weak var appIconImageView: UIImageView!
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var subTitleLabel: UILabel!
-    @IBOutlet weak var downloadButton: UIButton!
-    @IBOutlet weak var etcButton: UIButton!
-    
-    let disposeBag = DisposeBag()
-    static let identifier = "AppTitleCell"
-    
-    var etcAction: (() -> Void) = {}
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
     }
 }

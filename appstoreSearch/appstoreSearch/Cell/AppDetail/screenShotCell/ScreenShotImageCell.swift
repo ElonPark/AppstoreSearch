@@ -9,23 +9,23 @@
 import UIKit
 import RxSwift
 
-extension ScreenShotImageCell {
-    
-    func setImage(by urlString: String) {
-        screenShot
-            .rx_setImage(by: urlString)
-            .disposed(by: disposeBag)
-    }
-}
 
-class ScreenShotImageCell: UICollectionViewCell {
+final class ScreenShotImageCell: UICollectionViewCell {
     
     @IBOutlet weak var screenShot: UIImageView!
     
-    let disposeBag = DisposeBag()
+    private let disposeBag = DisposeBag()
     static let identifier = "ScreenShotImageCell"
     
     override func awakeFromNib() {
         screenShot.image = nil
+    }
+}
+
+extension ScreenShotImageCell {
+    func setImage(by urlString: String) {
+        screenShot
+            .rx_setImage(by: urlString)
+            .disposed(by: disposeBag)
     }
 }

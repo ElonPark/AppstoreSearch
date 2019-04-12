@@ -9,7 +9,7 @@
 import UIKit
 
 
-class SearchResultsViewController: UIViewController {
+final class SearchResultsViewController: UIViewController {
 
     var currentVC: ResultTypeController?
     

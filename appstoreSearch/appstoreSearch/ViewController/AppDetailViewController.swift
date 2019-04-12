@@ -12,7 +12,7 @@ import RxCocoa
 import SnapKit
 
 
-class AppDetailViewController: UIViewController {
+final class AppDetailViewController: UIViewController {
 
     
     @IBOutlet weak var detailTableView: UITableView!
