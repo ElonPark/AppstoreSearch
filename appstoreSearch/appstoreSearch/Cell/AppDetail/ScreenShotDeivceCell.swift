@@ -16,7 +16,7 @@ final class ScreenShotDeivceCell: UITableViewCell {
     
     static let identifier = "ScreenShotDeivceCell"
     var needExtened: Bool = false
-    var readMore: (Bool) -> Void = {_ in }
+    var readMore: (Bool) -> Void = { _ in }
     
     override func awakeFromNib() {
         super.awakeFromNib()
