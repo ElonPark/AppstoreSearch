@@ -258,7 +258,9 @@ extension AppDetailViewController {
         
         switch model.type {
         case .title:
-            return factory.appTitleCell(by: table, data: model, etcAction: self.etcAction)
+            return factory.appTitleCell(by: table, data: model) { [weak self] in
+                self?.etcAction()
+            }
         case .rating:
             return factory.appRatingCell(by: table, data: model)
         case .feature:

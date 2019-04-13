@@ -23,7 +23,7 @@ final class AppTitleCell: UITableViewCell {
     static let identifier = "AppTitleCell"
     
     var etcAction: (() -> Void) = {}
-
+    
     override func awakeFromNib() {
         super.awakeFromNib()
     }
