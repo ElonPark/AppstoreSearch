@@ -17,6 +17,11 @@ enum ResultType {
 class ResultTypeController: UIViewController {
     var selectItem: (Any) -> Void = { _ in }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.updateConstraintsIfNeeded()
+    }
+    
     func add(to parent: UIViewController) {
         parent.addChild(self)
         parent.view.addSubview(self.view)
@@ -26,7 +31,6 @@ class ResultTypeController: UIViewController {
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
         }
-
         self.didMove(toParent: parent)
     }
     

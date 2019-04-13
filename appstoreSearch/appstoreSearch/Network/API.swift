@@ -42,16 +42,13 @@ final class API {
             "term" : keyword,
             "media" : "software",
             "entity" : "software",
-            "limit" : "10",
+            "limit" : "5",
             "lang" : "ko_kr",
             "country" : "kr"
         ]
         
         let url = requsetURL(hostURL + endpoint, with: parameter)
-        
-        //네트워크 관련 라이브러리 사용 제한
-        //URLSession.shared.rx.json(url: url)
-        
+   
         return requestSearchResult(by: url)
     }
     
@@ -69,10 +66,10 @@ final class API {
                     do {
                         let result = try Result(data: data)
                         observer.onNext(result)
+                        observer.onCompleted()
                     } catch {
                         observer.onError(error)
                     }
-                    observer.onCompleted()
                 }
             }
             

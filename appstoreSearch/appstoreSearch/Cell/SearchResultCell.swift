@@ -57,10 +57,8 @@ extension SearchResultCell {
         }
     }
     
-    private func setAppIconImageView(by urlString: String) {
-        appIconImageView
-            .rx_setImage(by: urlString)
-            .disposed(by: disposeBag)
+    private func setAppIconImageView(by image: UIImage?) {
+        appIconImageView.image = image
     }
     
     private func setTitleLabel(text: String) {
@@ -98,26 +96,9 @@ extension SearchResultCell {
         
         ratingLabel.text = ratingText
     }
-    
-    ///TODO: 이미지 로딩 개선
-    private func setScreenShotImageViews(by urlStrings: [String]) {
-        for index in 0..<screenShotImageViews.count {
-            let imageView = screenShotImageViews[index]
-            if let urlString = urlStrings[safe: index] {
-                imageView
-                    .rx_setImage(by: urlString)
-                    .disposed(by: disposeBag)
-            } else {
-                imageView.isHidden = true
-            }
-        }
-    }
-    
-    private func setDownloadButton(title: String?) {
-        var buttonTitle = title ?? "무료"
-        if buttonTitle == "무료" {
-            buttonTitle = "받기"
-        }
+   
+    private func setDownloadButton(title: String) {
+        let buttonTitle = title == "무료" ? "받기" : title
         
         downloadButton.setTitle(buttonTitle, for: .normal)
         downloadButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
@@ -135,16 +116,21 @@ extension SearchResultCell {
             .disposed(by: disposeBag)
     }
     
-    func setUI(with model: ResultElement) {
-        resultElement = model
-        setAppIconImageView(by: model.artworkURL100)
-        setTitleLabel(text: model.trackName)
-        setSubTitleLabel(text: model.genres[safe: 0])
-        setStarRating(value: model.averageUserRatingForCurrentVersion)
-        setRatingLabel(value: model.userRatingCountForCurrentVersion)
-        setScreenShotImageViews(by: model.screenshotURLs)
-        setDownloadButton(title: model.formattedPrice)
-        tapDownload(with: model.trackViewURL)
-        
+    private func setScreenshots(by images: [UIImage?]) {
+        for i in 0..<screenShotImageViews.count {
+            guard let image = images[safe: i] else { continue }
+            screenShotImageViews[i].image = image
+        }
+    }
+    
+    func setUI(with data: AppResult) {
+        setAppIconImageView(by: data.iconImage)
+        setTitleLabel(text: data.name)
+        setSubTitleLabel(text: data.category)
+        setStarRating(value: data.rating)
+        setRatingLabel(value: data.ratingCount)
+        setDownloadButton(title: data.price)
+        tapDownload(with: data.appStoreURL)
+        setScreenshots(by: data.screenshots)
     }
 }

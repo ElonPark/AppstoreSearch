@@ -22,20 +22,22 @@ final class AppResultsViewController: ResultTypeController {
     private let disposeBag = DisposeBag()
     
     var searchResult: Result?
+    private let cellHeight: CGFloat = 305
     let rx_searchText = BehaviorRelay(value: String())
-    let dataSource = BehaviorRelay(value: [ResultElement]())
+    let dataSource = BehaviorRelay(value: [AppResult]())
+    
+    deinit {
+        Log.verbose("deinit")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setSearchResultTableView()
+        
         searchText()
         dataBinding()
         selectCellItem()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
     }
 }
 
@@ -56,16 +58,11 @@ extension AppResultsViewController {
         searchResultTableView.dataSource = nil
         
         searchResultTableView.rowHeight = UITableView.automaticDimension
-        searchResultTableView.estimatedRowHeight = 310
+        searchResultTableView.estimatedRowHeight = cellHeight
     }
     
     private func setResultEmptyView(with searchText: String) {
         searchTextLabel.text = "'\(searchText)'"
-    }
-    
-    private func updateDataSource(by result: Result) {
-        searchResult = result
-        dataSource.accept(result.results)
     }
     
     private func showResultEmptyView() {
@@ -73,34 +70,86 @@ extension AppResultsViewController {
         searchResultTableView.isHidden = true
     }
     
-    private func checkResultCount() {
-        guard let result = searchResult else { return }
-        searchResultTableView.isHidden = result.resultCount < 1
+    private func checkResultCount(by result: Result) {
+        Log.verbose(result.resultCount)
+        guard result.resultCount < 1 else { return }
+        showResultEmptyView()
+    }
+    
+    private func requestImages(by model: ResultElement) -> [Observable<Data>] {
+        let iconURLString = model.artworkURL100
+        var requests = [API.shared.requestImage(urlString: iconURLString)]
+        
+        for i in 0..<model.screenshotURLs.count {
+            guard i < 3 else { break }
+            guard let urlString = model.screenshotURLs[safe: i] else { continue }
+            requests.append(API.shared.requestImage(urlString: urlString))
+        }
+        
+        return requests
+    }
+    
+    private func rx_appResult(by element: ResultElement) -> Observable<AppResult> {
+        let scheduler = ConcurrentDispatchQueueScheduler(qos: .utility)
+        let imageRequests = requestImages(by: element)
+        
+        return Observable.concat(imageRequests)
+            .observeOn(scheduler)
+            .map { UIImage(data: $0) }
+            .reduce([UIImage?]()) { images, image in
+                var appImages = images
+                appImages.append(image)
+                return appImages
+            }
+            .map { images in
+                var appImages = images
+                var result = AppResult(element)
+                result.iconImage = appImages.removeFirst()
+                result.screenshots = appImages
+                return result
+        }
+    }
+
+    private func updateDataSource(by result: Result) {
+        searchResult = result
+        guard result.resultCount > 0 else { return }
+        
+        Observable.from(result.results)
+            .flatMap { self.rx_appResult(by: $0) }
+            .reduce([AppResult]()) { results, datum in
+                var appResults = results
+                appResults.append(datum)
+                return appResults
+            }
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { [weak self] appResults in
+                self?.dataSource.accept(appResults)
+                }, onError: { error in
+                    Log.error(error.localizedDescription, error)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func search(by keyword: String) {
         API.shared.searchAppsotre(by: keyword.removeJamo())
             .retry(2)
-            .observeOn(ConcurrentDispatchQueueScheduler(qos: .default))
+            .observeOn(ConcurrentDispatchQueueScheduler(qos: .utility))
             .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { [weak self] result in
-                self?.updateDataSource(by: result)
-                }, onError: { [weak self] error in
-                    Log.error(error.localizedDescription, error)
-                    self?.showResultEmptyView()
-                }, onCompleted: { [weak self] in
-                    self?.checkResultCount()
+            .subscribe(onNext: { [weak self] searchResult in
+                self?.checkResultCount(by: searchResult)
+                self?.updateDataSource(by: searchResult)
+            }, onError: { [weak self] error in
+                Log.error(error.localizedDescription, error)
+                self?.showResultEmptyView()
             })
             .disposed(by: disposeBag)
     }
     
     private func searchText() {
         rx_searchText
-            .debounce(0.3, scheduler: MainScheduler.instance)
-            .distinctUntilChanged()
+            .filter { !$0.isEmpty }
             .bind { [unowned self] text in
                 self.setResultEmptyView(with: text)
-                self.dataSource.accept([])
                 self.search(by: text)
             }
             .disposed(by: disposeBag)
@@ -125,7 +174,7 @@ extension AppResultsViewController {
             .rx.itemSelected
             .asDriver()
             .drive(onNext: { [unowned self] indexPath in
-                let result = self.dataSource.value[indexPath.row]
+                let result = self.dataSource.value[indexPath.row].appData
                 self.selectItem(result)
                 self.searchResultTableView.deselectRow(at: indexPath, animated: false)
             })
