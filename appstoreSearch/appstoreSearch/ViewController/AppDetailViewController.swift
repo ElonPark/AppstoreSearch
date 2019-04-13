@@ -54,6 +54,10 @@ final class AppDetailViewController: UIViewController {
     
     lazy var dataSource = BehaviorRelay(value: appMenu)
     
+    deinit {
+        Log.verbose("deinit")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setNavigationBarIcon()
@@ -184,11 +188,19 @@ extension AppDetailViewController {
     private func etcAction() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        let share = UIAlertAction(title: "앱 공유하기", style: .default) { [weak self] (_) in
+        let shareTitle = "앱 공유하기"
+        let share = UIAlertAction(
+            title: shareTitle,
+            style: .default
+        ) { [weak self] (_) in
             self?.showShareSheet()
         }
         
-        let showOtherApp = UIAlertAction(title: "이 개발자의 다른 앱 보기", style: .default) { [weak self] (_) in
+        let otherAppTitle = "이 개발자의 다른 앱 보기"
+        let showOtherApp = UIAlertAction(
+            title: otherAppTitle,
+            style: .default
+        ) { [weak self] (_) in
             self?.moveAppStoreOtherApp()
         }
         
@@ -214,20 +226,23 @@ extension AppDetailViewController {
         case .feature:
             guard let releaseNote = model as? ReleaseNote  else { return }
             guard !releaseNote.needExtened else { return }
-            releaseNote.needExtened = needExtened
-            appMenu[index] = releaseNote
+            var data = releaseNote
+            data.needExtened = needExtened
+            appMenu[index] = data
 
         case .description:
             guard let description = model as? Description else { return }
             guard !description.needExtened else { return }
-            description.needExtened = needExtened
-            appMenu[index] = description
+            var data = description
+            data.needExtened = needExtened
+            appMenu[index] = data
             
         case .info:
             guard let info = model as? Info else { return }
             guard !info.needExtened else { return }
-            info.needExtened = needExtened
-            appMenu[index] = info
+            var data = info
+            data.needExtened = needExtened
+            appMenu[index] = data
             
         default:
             return
@@ -325,10 +340,10 @@ extension AppDetailViewController {
     private func tableViewDidScroll() {
         detailTableView
             .rx.contentOffset
-            .asDriver()
-            .drive(onNext: { [unowned self] contentOffset in
+            .observeOn(MainScheduler.asyncInstance)
+            .bind { [unowned self] contentOffset in
                 self.showNaviItemIfNeed(with: contentOffset)
-            })
+            }
             .disposed(by: disposeBag)
     }
 }

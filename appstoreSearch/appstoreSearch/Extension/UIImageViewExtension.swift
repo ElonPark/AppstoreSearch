@@ -17,7 +17,7 @@ extension UIImageView {
         return API.shared.requestImage(urlString: urlString)
             .observeOn(ConcurrentDispatchQueueScheduler(qos: .default))
             .retry(2)
-            .observeOn(MainScheduler.instance)
+            .observeOn(MainScheduler.asyncInstance)
             .subscribe(onNext: { [weak self] imageData in
                 self?.image = UIImage(data: imageData)
                 }, onError: { error in

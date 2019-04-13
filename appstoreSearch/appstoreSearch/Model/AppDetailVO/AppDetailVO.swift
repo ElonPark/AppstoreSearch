@@ -26,8 +26,7 @@ struct Rating: AppDetailProtocol {
     var contentRating: String
 }
 
-class Description: AppDetailProtocol {
-    
+struct Description: AppDetailProtocol {
     var type: DetailCellType
     var text: String
     var needExtened: Bool
@@ -39,15 +38,19 @@ class Description: AppDetailProtocol {
     }
 }
 
-final class ReleaseNote: Description {
-    
+struct ReleaseNote: AppDetailProtocol {
+    var type: DetailCellType
     var version: String
     var updateDate: Date
+    var text: String
+    var needExtened: Bool
     
     init(type: DetailCellType, version: String, updateDate: Date, text: String, needExtened: Bool) {
+        self.type = type
         self.version = version
         self.updateDate = updateDate
-        super.init(type: type, text: text, needExtened: needExtened)
+        self.text = text
+        self.needExtened = needExtened
     }
 }
 
@@ -63,12 +66,11 @@ struct ScreenShots: AppDetailProtocol {
 }
 
 struct InfoTitle: AppDetailProtocol {
-    
     var type: DetailCellType
     var title: String
 }
 
-final class Info: AppDetailProtocol {
+struct Info: AppDetailProtocol {
     var type: DetailCellType
     var title: String
     var subTitle: String

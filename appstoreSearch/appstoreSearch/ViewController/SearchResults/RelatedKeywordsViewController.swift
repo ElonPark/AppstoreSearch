@@ -18,9 +18,13 @@ final class RelatedKeywordsViewController: ResultTypeController {
     
     private let disposeBag = DisposeBag()
     
-    var relatedResults = [String]()
+    private var relatedResults = [String]()
     lazy var rx_searchText = BehaviorRelay(value: String())
     lazy var dataSource = BehaviorRelay(value: relatedResults)
+    
+    deinit {
+        Log.verbose("deinit")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,6 +46,7 @@ extension RelatedKeywordsViewController {
     
     private func searchText() {
         rx_searchText
+            .filter { !$0.isEmpty }
             .distinctUntilChanged()
             .observeOn(MainScheduler.instance)
             .bind { [unowned self] text in

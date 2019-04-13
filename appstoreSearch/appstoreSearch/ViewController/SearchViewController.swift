@@ -108,13 +108,11 @@ extension SearchViewController {
     }
     
     private func search(by index: IndexPath) {
-        let cell = searchHistoryTableView.cellForRow(at: index) as? HistoryCell
-        cell?.setSelected(false, animated: true)
-        
-        let text = cell?.titleLabel.text ?? ""
+        let text = dataSource.value[index.row]
+    
         navigationBarShadow(isHidden: false)
-        saveSearchText(text)
         setSearchBar(text: text)
+        saveSearchText(text)
         setResult(by: text, type: .result)
         
         Log.verbose(text)

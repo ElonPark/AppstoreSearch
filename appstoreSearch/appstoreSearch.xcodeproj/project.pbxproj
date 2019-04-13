@@ -51,6 +51,7 @@
 		DBB3E7AA2240273300E6ED2D /* UIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB3E7A92240273300E6ED2D /* UIExtensions.swift */; };
 		DBB3E7AC2240C81300E6ED2D /* ResultTypeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB3E7AB2240C81300E6ED2D /* ResultTypeController.swift */; };
 		DBB3E7AF2240D40A00E6ED2D /* SearchResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB3E7AE2240D40A00E6ED2D /* SearchResultsViewController.swift */; };
+		DBC634E1226137CD002BD367 /* AppResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC634E0226137CD002BD367 /* AppResults.swift */; };
 		F33860D58216106F6300750E /* Pods_appstoreSearchTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F142766CA3B8E7E86A55EC8F /* Pods_appstoreSearchTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -127,6 +128,7 @@
 		DBB3E7A92240273300E6ED2D /* UIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIExtensions.swift; sourceTree = "<group>"; };
 		DBB3E7AB2240C81300E6ED2D /* ResultTypeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultTypeController.swift; sourceTree = "<group>"; };
 		DBB3E7AE2240D40A00E6ED2D /* SearchResultsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsViewController.swift; sourceTree = "<group>"; };
+		DBC634E0226137CD002BD367 /* AppResults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppResults.swift; sourceTree = "<group>"; };
 		DEB9159E0F2D38C47CF06289 /* Pods-appstoreSearchUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-appstoreSearchUITests.release.xcconfig"; path = "Target Support Files/Pods-appstoreSearchUITests/Pods-appstoreSearchUITests.release.xcconfig"; sourceTree = "<group>"; };
 		F142766CA3B8E7E86A55EC8F /* Pods_appstoreSearchTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_appstoreSearchTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FDEC759BB4BEF8C7B4305896 /* Pods-appstoreSearch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-appstoreSearch.release.xcconfig"; path = "Target Support Files/Pods-appstoreSearch/Pods-appstoreSearch.release.xcconfig"; sourceTree = "<group>"; };
@@ -204,6 +206,7 @@
 			children = (
 				DB8B6BF6223D025900BDDB18 /* SerachResult.swift */,
 				DB8B6C01223E690000BDDB18 /* SearchHistory.swift */,
+				DBC634E0226137CD002BD367 /* AppResults.swift */,
 				DB9D540A2244D98F008E6843 /* AppDetailVO */,
 			);
 			path = Model;
@@ -608,6 +611,7 @@
 				DB5192C82242609E0014A0A5 /* AppTitleCell.swift in Sources */,
 				DBB3E7AF2240D40A00E6ED2D /* SearchResultsViewController.swift in Sources */,
 				DBB3E7AC2240C81300E6ED2D /* ResultTypeController.swift in Sources */,
+				DBC634E1226137CD002BD367 /* AppResults.swift in Sources */,
 				DB8B6C0E223E9AFB00BDDB18 /* RelatedResultCell.swift in Sources */,
 				DB72E2202243DE7F00D54DA1 /* AppDetailCellFactory.swift in Sources */,
 				DB9D5407224433D5008E6843 /* AppDetailVO.swift in Sources */,
