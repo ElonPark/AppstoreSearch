@@ -20,6 +20,12 @@ final class SearchResultsViewController: UIViewController {
         super.viewDidLoad()
     }
 
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        currentVC?.remove()
+        currentVC = nil
+    }
+    
     private func change(vc: ResultTypeController?) {
         currentVC?.remove()
         currentVC = nil

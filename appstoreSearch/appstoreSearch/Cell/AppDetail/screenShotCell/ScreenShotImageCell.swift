@@ -7,14 +7,11 @@
 //
 
 import UIKit
-import RxSwift
-
 
 final class ScreenShotImageCell: UICollectionViewCell {
     
     @IBOutlet weak var screenShot: UIImageView!
     
-    private let disposeBag = DisposeBag()
     static let identifier = "ScreenShotImageCell"
     
     override func awakeFromNib() {
@@ -23,9 +20,7 @@ final class ScreenShotImageCell: UICollectionViewCell {
 }
 
 extension ScreenShotImageCell {
-    func setImage(by urlString: String) {
-        screenShot
-            .rx_setImage(by: urlString)
-            .disposed(by: disposeBag)
+    func setScreenshot(image: UIImage?) {
+        screenShot.image = image
     }
 }

@@ -90,11 +90,10 @@ extension AppResultsViewController {
     }
     
     private func rx_appResult(by element: ResultElement) -> Observable<AppResult> {
-        let scheduler = ConcurrentDispatchQueueScheduler(qos: .utility)
+        
         let imageRequests = requestImages(by: element)
         
         return Observable.concat(imageRequests)
-            .observeOn(scheduler)
             .map { UIImage(data: $0) }
             .reduce([UIImage?]()) { images, image in
                 var appImages = images
@@ -113,8 +112,10 @@ extension AppResultsViewController {
     private func updateDataSource(by result: Result) {
         searchResult = result
         guard result.resultCount > 0 else { return }
+        let scheduler = ConcurrentDispatchQueueScheduler(qos: .utility)
         
         Observable.from(result.results)
+            .subscribeOn(scheduler)
             .flatMap { self.rx_appResult(by: $0) }
             .reduce([AppResult]()) { results, datum in
                 var appResults = results
@@ -122,8 +123,8 @@ extension AppResultsViewController {
                 return appResults
             }
             .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { [weak self] appResults in
-                self?.dataSource.accept(appResults)
+            .subscribe(onNext: { appResults in
+                self.dataSource.accept(appResults)
                 }, onError: { error in
                     Log.error(error.localizedDescription, error)
             })
@@ -131,16 +132,18 @@ extension AppResultsViewController {
     }
     
     private func search(by keyword: String) {
+        let scheduler = ConcurrentDispatchQueueScheduler(qos: .utility)
+        
         API.shared.searchAppsotre(by: keyword.removeJamo())
             .retry(2)
-            .observeOn(ConcurrentDispatchQueueScheduler(qos: .utility))
+            .subscribeOn(scheduler)
             .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { [weak self] searchResult in
-                self?.checkResultCount(by: searchResult)
-                self?.updateDataSource(by: searchResult)
-            }, onError: { [weak self] error in
+            .subscribe(onNext: { searchResult in
+                self.checkResultCount(by: searchResult)
+                self.updateDataSource(by: searchResult)
+            }, onError: { error in
                 Log.error(error.localizedDescription, error)
-                self?.showResultEmptyView()
+                self.showResultEmptyView()
             })
             .disposed(by: disposeBag)
     }
@@ -148,9 +151,9 @@ extension AppResultsViewController {
     private func searchText() {
         rx_searchText
             .filter { !$0.isEmpty }
-            .bind { [unowned self] text in
-                self.setResultEmptyView(with: text)
-                self.search(by: text)
+            .bind { [weak self] text in
+                self?.setResultEmptyView(with: text)
+                self?.search(by: text)
             }
             .disposed(by: disposeBag)
     }

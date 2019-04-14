@@ -18,7 +18,7 @@ final class ScreenShotCell: UITableViewCell {
     private let disposeBag = DisposeBag()
     static let identifier: String = "ScreenShotCell"
     
-    lazy var dataSource = BehaviorRelay(value: [String]())
+    lazy var dataSource = BehaviorRelay(value: [UIImage?]())
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -33,22 +33,26 @@ extension ScreenShotCell {
     
     private func dataBinding() {
         dataSource
-            .observeOn(MainScheduler.instance)
-            .bind(to: imageCollectionView.rx.items) { collectionView, item, urlString in
-                let index = IndexPath(item: item, section: 0)
-                let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: ScreenShotImageCell.identifier,
-                    for: index
-                    ) as! ScreenShotImageCell
-                cell.setImage(by: urlString)
-                
-                return cell
+            .asDriver()
+            .drive(imageCollectionView.rx.items(
+                cellIdentifier: ScreenShotImageCell.identifier,
+                cellType: ScreenShotImageCell.self)) { row, image, cell in
+                    cell.setScreenshot(image: image)
             }
             .disposed(by: disposeBag)
-        
     }
     
     func setScreenShot(with model: ScreenShots) {
-        dataSource.accept(model.urlStrings)
+        Observable.from(model.urlStrings)
+        .observeOn(ConcurrentDispatchQueueScheduler(qos: .utility))
+            .flatMap { API.shared.requestImage(urlString: $0) }
+            .map{ UIImage(data: $0) }
+            .reduce([UIImage?]()) { screenshots, screenshot in
+                var images = screenshots
+                images.append(screenshot)
+                return images
+        }
+        .subscribe(onNext: dataSource.accept)
+        .disposed(by: disposeBag)
     }
 }
