@@ -250,7 +250,7 @@ extension AppDetailViewController {
         
         dataSource.accept(appMenu)
         let indexPath = IndexPath(row: index, section: 0)
-        detailTableView.scrollToRow(at: indexPath, at: .top, animated: false)
+        detailTableView.scrollToRow(at: indexPath, at: .top, animated: true)
     }
     
     private func makeCell(table: UITableView, index: Int, model: AppDetailProtocol) -> UITableViewCell {
